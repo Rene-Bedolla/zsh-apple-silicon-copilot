@@ -13,7 +13,7 @@ Unlike traditional dotfiles, this repository is designed exclusively for **Apple
 
 ## 📦 One-Click Installation
 
-Open your Mac terminal and paste this magic command:
+Open your Mac terminal and paste this command:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Rene-Bedolla/zsh-apple-silicon-copilot/main/install.sh)"
@@ -75,4 +75,4 @@ The environment replaces legacy Unix commands with modern, Rust-based alternativ
 ## 🏗️ Modular Architecture
 This setup uses a dynamic modular architecture. Drop any `.zsh` script inside the `~/.zsh/funciones/` folder, and it will be auto-loaded upon opening the terminal. Private configurations can be placed in `~/Documents/dotfiles/privado/` (which is git-ignored by default).
 
-*Crafted with ❤️ by [René López Bedolla](https://github.com/Rene-Bedolla).*
+*Crafted with ❤️ by [René Bedolla](https://github.com/Rene-Bedolla).*
