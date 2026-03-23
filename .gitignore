@@ -11,3 +11,11 @@
 *.log
 .cache/
 
+# Entorno Privado de René
+privado/
+.*_NAS
+
+# Archivos de respaldo locales
+*.seguro
+*.backup
+*.bak
