@@ -10,6 +10,31 @@
 export MLX_COPILOT_MODEL="mlx-community/Qwen3-4B-4bit"
 
 # -------------------------------------------------------------------
+# mlx-check
+# Diagnóstico automático de dependencias MLX. Muestra el estado real.
+# -------------------------------------------------------------------
+function mlx-check() {
+    echo "🔍 DIAGNÓSTICO MLX PARA dev_copilot.zsh"
+    echo ""
+    echo "Python que usa dev_copilot:"
+    echo "  $(which python3)"
+    echo ""
+    echo "Python que instaló pip3:"
+    which pip3 | xargs -I {} dirname {} | xargs -I {} ls {}/python3* 2>/dev/null || echo "No encontrado"
+    echo ""
+    echo "mlx_lm instalado:"
+    python3 -c "import mlx_lm; print('✅ mlx_lm OK')" 2>&1 || echo "❌ mlx_lm NO encontrado"
+    echo ""
+    echo "Modelo descargado:"
+    python3 -c "
+from mlx_lm import load
+model, tokenizer = load('$MLX_COPILOT_MODEL', verbose=False)
+print('✅ Modelo listo')
+" 2>&1 || echo "❌ Problema con el modelo"
+    echo ""
+}
+
+# -------------------------------------------------------------------
 # git-ia
 # Analiza 'git diff' y sugiere 3 mensajes de commit profesionales.
 # -------------------------------------------------------------------
