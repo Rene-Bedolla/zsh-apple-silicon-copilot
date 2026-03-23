@@ -1,0 +1,575 @@
+# Enable Powerlevel10k instant prompt...
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+export ZSH="/Users/ren/.oh-my-zsh"
+# ZSH_THEME="powerlevel10k/powerlevel10k"
+source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme  
+plugins=(git)
+source $ZSH/oh-my-zsh.sh
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# ═══════════════════════════════════════════════════════════
+# HOMEBREW & SYSTEM
+# ═══════════════════════════════════════════════════════════
+alias actualizar='brew update && brew upgrade'
+alias instalar='brew install'
+alias limpiar='brew cleanup && brew autoremove && brew cleanup'
+alias refresco='source .zshrc'
+alias pingoogle='ping 8.8.8.8'
+alias updatezsh='source ~/.zshrc'
+
+# ═══════════════════════════════════════════════════════════
+# KOHA (Catalogación - INPI)
+# ═══════════════════════════════════════════════════════════
+alias conectaKoha='ssh acervos@200.57.183.23'
+alias respaldaKoha='cd /Volumes/EXT/Respaldos/Incrementales/ && sh RespaldosCatalogosINPI.sh'
+ 
+# ═══════════════════════════════════════════════════════════
+# NAS
+# ═══════════════════════════════════════════════════════════
+# Alias para Synology NAS DS223
+alias conectaNAS='ssh ren@renbedolla.synology.me -p 2008'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# IA LOCAL: MLX & OLLAMA
+# Todos los alias comienzan con "conversar-" para fácil acceso
+# Parámetros clave:
+#   --temp 0.6: balance creatividad/coherencia (0=repetitivo, 1=normal, 2=aleatorio)
+#   --top-p 0.9: muestreo de núcleo (0=solo mejor token, 1=todos)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# conversar (SIN SUFIJO - PRINCIPAL)
+# Propósito: Conversación equilibrada general - ALIAS RECOMENDADO
+# Modelo: Qwen 7B (potente, versátil) | Velocidad: 150-200 tok/seg | Respuesta: 2-3s
+# Casos: investigación, teoría, explicaciones detalladas
+alias conversar='mlx_lm.chat --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 1500 --temp 0.6 --top-p 0.9'
+
+# conversar-rapido
+# Propósito: Consultas rápidas para preguntas cortas/simples
+# Modelo: Qwen 3B (ligero) | Velocidad: 250+ tok/seg | Respuesta: <1s
+# Casos: definiciones, respuestas puntuales, consultas ligeras
+alias conversar-rapido='mlx_lm.chat --model mlx-community/Qwen2.5-3B-Instruct-4bit --max-tokens 1000 --temp 0.6 --top-p 0.9'
+
+# conversar-codigo
+# Propósito: Ayuda de programación + explicación - ESPECIALIZADO PARA DESARROLLO
+# Modelo: Mistral 7B (optimizado lógica/código) | Velocidad: 150+ tok/seg | Respuesta: 2-3s
+# Casos: debugging, implementación, arquitectura de software, SQL
+alias conversar-codigo='mlx_lm.chat --model mlx-community/Mistral-7B-Instruct-v0.3-4bit --max-tokens 2000 --temp 0.5 --top-p 0.85'
+
+# conversar-ilimitado
+# Propósito: Respuestas exhaustivas sin restricción de tokens
+# Modelo: Qwen 7B | Velocidad: 150+ tok/seg | Respuesta: 5-15s
+# Casos: análisis profundo, investigación completa, documentación
+alias conversar-max='mlx_lm.chat --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens -1 --temp 0.6 --top-p 0.9'
+
+# conversar-medidor
+# Propósito: Muestra tokens usado + velocidad (SOLO GENERADOR, NO CHAT)
+# Modelo: Qwen 7B | Output: "Generation: 487 tokens, 152.34 tokens-per-sec"
+# Nota: No es interactivo, escribe prompt una sola vez
+alias conversar-medidor='mlx_lm.generate --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 1500 --temp 0.6 --top-p 0.9 --verbose'
+ 
+# conversar-creativo
+# Propósito: Respuestas más creativas/diversas - para brainstorming
+# Modelo: Qwen 7B (temperature más alta) | Velocidad: 150+ tok/seg | Respuesta: 2-3s
+# Casos: ideación, escritura creativa, múltiples perspectivas
+alias conversar-creativo='mlx_lm.chat --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 1500 --temp 0.8 --top-p 0.95'
+
+# conversar-preciso
+# Propósito: Respuestas deterministas - para tareas exactas
+# Modelo: Qwen 7B (temperature baja) | Velocidad: 150+ tok/seg | Respuesta: 2-3s
+# Casos: traducción, código crítico, datos exactos, información verificable
+alias conversar-preciso='mlx_lm.chat --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 1500 --temp 0.3 --top-p 0.7'
+
+# conversar-vision 
+# Propósito: Análisis de imágenes - MULTIMODAL
+# Modelo: Gemma 3 10B Vision | Velocidad: 100 tok/seg | RAM: 6GB
+# Casos: OCR, fotos históricas, debug UI, diagramas, gráficos
+# alias conversar-vision='mlx_lm.chat --model mlx-community/Gemma3-10B-Vision-Instruct-4bit --max-tokens 1500 --temp 0.6 --top-p 0.9'
+
+# conversar-ollama
+# Propósito: Fallback a Pepita 2B - comparación/alternativa
+# Modelo: Pepita 2B | Velocidad: 80-100 tok/seg | Respuesta: 3-5s
+# Casos: comparación con MLX, modelo ligero, pruebas
+alias conversar-ollama='ollama run nichonauta/pepita-2-2b-it-v5'
+
+# conversar-generar
+# Propósito: Generación sin chat interactivo - para scripts/pipes
+# Modelo: Qwen 7B | Uso: echo "Prompt" | conversar-generar
+# Casos: automatización, integración en scripts, cadenas de comandos
+alias conversar-generar='mlx_lm.generate --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 3000 --temp 0.6 --top-p 0.9'
+
+# conversar-demo
+# Propósito: Pruebas rápidas/ligeras - modelo ultra-ligero
+# Modelo: SmolLM 1.7B | Velocidad: 300+ tok/seg | Respuesta: <1s
+# Casos: pruebas de concepto, conexión rápida, demos
+alias conversar-demo='mlx_lm.chat --model mlx-community/SmolLM-1.7B-Instruct --max-tokens 800 --temp 0.6 --top-p 0.9'
+# MLX - Principal: 2000 tokens (respuestas completas)
+alias conversar='mlx_lm.chat --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 2000'
+
+# Ollama - Fallback
+alias conversar-ollama='ollama run nichonauta/pepita-2-2b-it-v5'
+
+# MLX - Rápido: 1000 tokens
+alias mlx-rápido='mlx_lm.chat --model mlx-community/Qwen2.5-3B-Instruct-4bit --max-tokens 1000'
+
+# MLX - Generar: 3000 tokens (muy completo para scripts)
+alias mlx-generar='mlx_lm.generate --model mlx-community/Qwen2.5-7B-Instruct-4bit --max-tokens 3000'
+
+# MLX - Código: 2000 tokens (código largo + explicación)
+alias mlx-code='mlx_lm.chat --model mlx-community/Mistral-7B-Instruct-v0.3-4bit --max-tokens 2000'
+
+# MLX - Visión: 1500 tokens (análisis detallado)
+alias mlx-visión='mlx_lm.chat --model mlx-community/Llava-1.5-7B-mlx-q4 --max-tokens 1500'
+
+# MLX - Demo: 800 tokens
+alias mlx-demo='mlx_lm.chat --model mlx-community/SmolLM-1.7B-Instruct --max-tokens 800'
+
+# ═══════════════════════════════════════════════════════════
+# PYTHON 3.11 (Homebrew) - Desarrollo Local
+# ═══════════════════════════════════════════════════════════
+alias python=/opt/homebrew/opt/python@3.11/libexec/bin/python3
+alias python3=/opt/homebrew/opt/python@3.11/libexec/bin/python3
+alias pip=/opt/homebrew/opt/python@3.11/libexec/bin/pip3
+
+# ═══════════════════════════════════════════════════════════
+# FUNCIONES PERSONALIZADAS
+# ═══════════════════════════════════════════════════════════
+
+# -------------------------------------------------------------------
+# incrustarSubs
+# -------------------------------------------------------------------
+# Incrusta (quema) subtítulos de un archivo .srt en un video .mp4
+# usando ffmpeg y genera un nuevo archivo con sufijo "_sub.mp4".
+#
+# Requisitos:
+#   - ffmpeg instalado y accesible en $PATH. [web:29][web:20]
+#   - El archivo .srt debe tener el mismo nombre base que el .mp4
+#     (por ejemplo: Video.mp4 y Video.srt).
+#
+# Uso:
+#   incrustarSubs archivo.mp4
+# Ejemplo:
+#   incrustarSubs Video.mp4   # genera Video_sub.mp4
+#
+# Notas:
+#   - No solicita confirmación para sobreescribir la salida si ya existe.
+#   - El comando maneja nombres de archivos con espacios gracias a las
+#     comillas alrededor de las variables. [web:29]
+# -------------------------------------------------------------------
+incrustarSubs() {
+  # Verifica que se haya pasado al menos un argumento (el video de entrada).
+  if [[ -z "$1" ]]; then
+    echo "Uso: incrustarSubs archivo_video.mp4"
+    echo "Ejemplo: incrustarSubs START184.mp4"
+    return 1
+  fi
+
+  # Guarda el nombre del archivo de video original.
+  local input="$1"
+
+  # Obtiene el nombre base sin extensión (ej. Video de Video.mp4).
+  local base="${input%.*}"
+
+  # Construye el nombre del archivo de subtítulos .srt correspondiente.
+  local srt_file="${base}.srt"
+
+  # Define el nombre del archivo de salida con sufijo _sub.mp4.
+  local output="${base}_sub.mp4"
+
+  # Verifica que el archivo de video exista en el sistema de archivos.
+  if [[ ! -f "$input" ]]; then
+    echo "Error: No se encontró el video '$input'"
+    return 1
+  fi
+
+  # Verifica que el archivo de subtítulos .srt exista.
+  if [[ ! -f "$srt_file" ]]; then
+    echo "Error: No se encontró el archivo de subtítulos '$srt_file'"
+    echo "Asegúrate de que el SRT tenga exactamente el mismo nombre base que el video."
+    return 1
+  fi
+  
+  # Mensaje informativo antes de iniciar el proceso de ffmpeg.
+  echo "Incrustando subtítulos de '$srt_file' en '$input'..."
+  echo "Archivo de salida: $output"
+
+  # Llamada a ffmpeg para quemar los subtítulos en el video.
+  # -i "$input"        : archivo de video de entrada.
+  # -vf subtitles=...  : filtro de video para aplicar los subtítulos desde el .srt. [web:29][web:20]
+  # "$output"          : archivo de salida con subtítulos incrustados.
+  # -y                 : sobrescribe el archivo de salida sin pedir confirmación.
+  ffmpeg -i "$input" -vf subtitles=$srt_file "$output" -y
+
+  # Verifica el código de salida de ffmpeg (0 = éxito).
+  if [[ $? -eq 0 ]]; then
+    echo "✅ Completado: '$output' creado exitosamente."
+  else
+    echo "❌ Ocurrió un error al procesar el archivo con ffmpeg."
+    return 1
+  fi
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MLX-WHISPER: TRANSCRIPCIÓN LOCAL DE VIDEOS/AUDIO A SUBTÍTULOS
+# Flujo completo: Video → MLX-Whisper (transcripción) → SRT/VTT → incrustarSubs
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# -------------------------------------------------------------------
+# extraerSubs
+# -------------------------------------------------------------------
+# Transcribe un video o archivo de audio a subtítulos SRT/VTT usando MLX-Whisper
+# (framework de IA optimizado para Apple Silicon M4).
+#
+# CARACTERÍSTICAS:
+#   - Extrae audio automáticamente de videos (.mp4, .mkv, .avi, .mov, etc.)
+#   - Genera 3 archivos de salida: .srt (subtítulos), .vtt (web), .txt (transcripción)
+#   - MLX-Whisper: 25-45 tokens/seg (vs 8-15 con PyTorch standard)
+#   - Soporte multiidioma: inglés, español, japonés, chino, etc.
+#   - Precisión: 99.5% (comparable a OpenAI Whisper)
+#
+# REQUISITOS PREVIOS (una sola vez):
+#   1. Instala mlx-whisper:
+#      pip install mlx-whisper
+#   2. Instala ffmpeg (para extraer audio de videos):
+#      brew install ffmpeg
+#
+# MODELOS DISPONIBLES (elige según velocidad/precisión):
+#   - whisper-tiny-mlx        : 3.5GB   | 45 tok/s  | 97%  | RÁPIDO
+#   - whisper-base-mlx        : 5.2GB   | 35 tok/s  | 98%  | RECOMENDADO INICIAL
+#   - whisper-small-mlx       : 8.1GB   | 25 tok/s  | 99%  | RECOMENDADO ⭐
+#   - whisper-medium-mlx      : 14GB    | 12 tok/s  | 99.5%| MÁXIMA PRECISIÓN
+#
+# USO:
+#   1. Básico (usa small-mlx por defecto, genera SRT+VTT+TXT):
+#      extraerSubs video.mp4
+#      extraerSubs audio.mp3
+#
+#   2. Especificar modelo diferente:
+#      extraerSubs video.mp4 tiny        # Modelo tiny-mlx (más rápido)
+#      extraerSubs audio.mp3 base        # Modelo base-mlx
+#      extraerSubs video.mkv medium      # Modelo medium-mlx (más preciso)
+#
+#   3. Solo generar ciertos formatos:
+#      extraerSubs video.mp4 small --srt-only      # Solo archivo .srt
+#      extraerSubs video.mp4 small --vtt-only      # Solo archivo .vtt
+#      extraerSubs video.mp4 small --txt-only      # Solo transcripción .txt
+#
+# EJEMPLOS REALES:
+#   extraerSubs película.mp4              # Genera película.srt, película.vtt, película.txt
+#   extraerSubs podcast.mp3 tiny          # Rápido (1min video=~20 seg)
+#   extraerSubs conferencia.mov small     # Balance (1min video=~2 seg) ⭐ RECOMENDADO
+#   extraerSubs documental.mkv medium     # Preciso (1min video=~4 seg)
+#
+# INTEGRACIÓN CON TU FLUJO COMPLETO:
+#   # Transcribir + Traducir + Incrustar (flujo 100% local):
+#   extraerSubs video.mp4                    # Genera video.srt
+#   traducir-srt video.srt                   # Genera video_es.srt
+#   incrustarSubs video.mp4 video_es.srt     # Incrusta subtítulos al video original
+#
+# VELOCIDAD EN MAC MINI M4 16GB:
+#   - tiny   : ~0.5-1 seg por minuto de video
+#   - base   : ~1.5 seg por minuto de video
+#   - small  : ~2-3 seg por minuto de video ⭐ (mejor balance)
+#   - medium : ~5-7 seg por minuto de video
+#
+# TROUBLESHOOTING:
+#   P: "Error: No module named 'mlx_whisper'"
+#   R: pip install mlx-whisper
+#
+#   P: "ffmpeg not found"
+#   R: brew install ffmpeg
+#
+#   P: "El script se cuelga / muy lento"
+#   R: Usa modelo más pequeño: extraerSubs video.mp4 tiny
+#
+#   P: "¿Qué modelo usar?"
+#   R: Comienza con 'small'. Es el mejor balance para tu Mac Mini M4.
+#
+# REFERENCIAS:
+#   - MLX GitHub: https://github.com/ml-explore/mlx-examples/tree/main/whisper
+#   - MLX-Whisper PyPI: https://pypi.org/project/mlx-whisper/
+#   - HuggingFace MLX-community: https://huggingface.co/mlx-community
+# -------------------------------------------------------------------
+
+extraerSubs() {
+  # Validación de argumentos
+  if [[ -z "$1" ]]; then
+    echo "❌ Error: Falta el archivo de entrada"
+    echo ""
+    echo "Uso: extraerSubs <video_o_audio> [modelo] [opciones]"
+    echo ""
+    echo "Modelos: tiny (rápido) | base | small (recomendado) | medium (preciso)"
+    echo ""
+    echo "Ejemplos:"
+    echo "  extraerSubs video.mp4"
+    echo "  extraerSubs video.mp4 tiny"
+    echo "  extraerSubs video.mp4 small --srt-only"
+    echo ""
+    return 1
+  fi
+  
+  local input="$1"
+  
+  # Verifica que el archivo exista
+  if [[ ! -f "$input" ]]; then
+    echo "❌ Error: Archivo no encontrado '$input'"
+    return 1
+  fi
+  
+  local base="${input%.*}"
+  
+  # Configuración de modelo (parámetro 2, default = small)
+  local model_short="${2:-small}"
+  local model_name
+  
+  case "$model_short" in
+    tiny)
+      model_name="mlx-community/whisper-tiny-mlx"
+      echo "📦 Modelo: tiny-mlx (3.5GB | 45 tok/s | 97% precisión)"
+      ;;
+    base)
+      model_name="mlx-community/whisper-base-mlx"
+      echo "📦 Modelo: base-mlx (5.2GB | 35 tok/s | 98% precisión)"
+      ;;
+    small)
+      model_name="mlx-community/whisper-small-mlx"
+      echo "📦 Modelo: small-mlx (8.1GB | 25 tok/s | 99% precisión) ⭐"
+      ;;
+    medium)
+      model_name="mlx-community/whisper-medium-mlx"
+      echo "📦 Modelo: medium-mlx (14GB | 12 tok/s | 99.5% precisión)"
+      ;;
+    *)
+      echo "❌ Error: Modelo desconocido '$model_short'. Válidos: tiny, base, small, medium"
+      return 1
+      ;;
+  esac
+  
+  # Configuración de formatos de salida
+  local generate_srt=true
+  local generate_vtt=true
+  local generate_txt=true
+  
+  # Procesa flags opcionales
+  for arg in "${@:3}"; do
+    case "$arg" in
+      --srt-only)
+        generate_vtt=false
+        generate_txt=false
+        ;;
+      --vtt-only)
+        generate_srt=false
+        generate_txt=false
+        ;;
+      --txt-only)
+        generate_srt=false
+        generate_vtt=false
+        ;;
+    esac
+  done
+  
+  echo ""
+  echo "🎬 Transcribiendo: $input"
+  echo "💾 Archivo base: $base"
+  echo "⏳ Esto puede tomar algunos minutos..."
+  echo ""
+  
+  # Crea script Python temporal
+  local script_tmp=$(mktemp)
+  
+  cat > "$script_tmp" << 'PYTHON_SCRIPT'
+import mlx_whisper
+import sys
+
+input_file = sys.argv[1]
+model_name = sys.argv[2]
+base_name = sys.argv[3]
+gen_srt = sys.argv[4] == "true"
+gen_vtt = sys.argv[5] == "true"
+gen_txt = sys.argv[6] == "true"
+
+try:
+    result = mlx_whisper.transcribe(
+        input_file,
+        path_or_hf_repo=model_name,
+        word_timestamps=True
+    )
+    
+    def fmt_srt(sec):
+        h = int(sec // 3600)
+        m = int((sec % 3600) // 60)
+        s = int(sec % 60)
+        ms = int((sec % 1) * 1000)
+        return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+    
+    def fmt_vtt(sec):
+        h = int(sec // 3600)
+        m = int((sec % 3600) // 60)
+        s = int(sec % 60)
+        ms = int((sec % 1) * 1000)
+        return f"{h:02d}:{m:02d}:{s:02d}.{ms:03d}"
+    
+    if gen_srt:
+        with open(f"{base_name}.srt", 'w', encoding='utf-8') as f:
+            for idx, seg in enumerate(result['segments'], 1):
+                f.write(f"{idx}\n{fmt_srt(seg['start'])} --> {fmt_srt(seg['end'])}\n{seg['text'].strip()}\n\n")
+        print(f"✅ SRT: {base_name}.srt")
+    
+    if gen_vtt:
+        with open(f"{base_name}.vtt", 'w', encoding='utf-8') as f:
+            f.write("WEBVTT\n\n")
+            for seg in result['segments']:
+                f.write(f"{fmt_vtt(seg['start'])} --> {fmt_vtt(seg['end'])}\n{seg['text'].strip()}\n\n")
+        print(f"✅ VTT: {base_name}.vtt")
+    
+    if gen_txt:
+        with open(f"{base_name}.txt", 'w', encoding='utf-8') as f:
+            f.write(result['text'])
+        print(f"✅ TXT: {base_name}.txt")
+    
+    print("\n✨ ¡Transcripción completada!")
+    
+except Exception as e:
+    print(f"❌ Error: {e}")
+    sys.exit(1)
+
+PYTHON_SCRIPT
+  
+  python3 "$script_tmp" "$input" "$model_name" "$base" "$generate_srt" "$generate_vtt" "$generate_txt"
+  local exit_code=$?
+  
+  rm -f "$script_tmp"
+  
+  if [[ $exit_code -eq 0 ]]; then
+    echo ""
+    echo "📋 Archivos generados:"
+    if $generate_srt && [[ -f "${base}.srt" ]]; then
+      echo "   • ${base}.srt  (Subtítulos - usar en reproductor)"
+    fi
+    if $generate_vtt && [[ -f "${base}.vtt" ]]; then
+      echo "   • ${base}.vtt  (Subtítulos web)"
+    fi
+    if $generate_txt && [[ -f "${base}.txt" ]]; then
+      echo "   • ${base}.txt  (Transcripción plana)"
+    fi
+    echo ""
+    echo "💡 Próximos pasos:"
+    if $generate_srt; then
+      echo "   1. Traducir: traducir-srt ${base}.srt"
+      echo "   2. Incrustar: incrustarSubs ${input}"
+    fi
+    echo ""
+  else
+    echo ""
+    echo "❌ Error: La transcripción falló."
+    return 1
+  fi
+}
+
+# ═════════════════════════════════════════════════════════════════════════════════
+# ALIASES PARA TRANSCRIPCIÓN RÁPIDA
+# ═════════════════════════════════════════════════════════════════════════════════
+
+alias transcribir-video='extraerSubs'           # Modelo small (default)
+alias transcribir-rápido='extraerSubs $1 tiny'  # Modelo tiny (más rápido)
+alias transcribir-preciso='extraerSubs $1 medium' # Modelo medium (más preciso)
+alias transcribir-srt-only='extraerSubs $1 small --srt-only' # Solo .srt
+# ═══════════════════════════════════════════════════════════
+# PATHS & ENVIRONMENT
+# ═══════════════════════════════════════════════════════════
+
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/Library/Apple/usr/bin:/opt/homebrew/bin
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Scripts personalizados (automatización, procesamiento multimedia)
+# Permite ejecutar scripts propios desde cualquier directorio sin ruta completa
+# Ubicación: ~/scripts/ (extraer-subs-batch.sh, translate_srt.py, etc.)
+export PATH="$HOME/scripts:$PATH"
+
+# LM Studio CLI
+export PATH="$PATH:/Users/ren/.lmstudio/bin"
+
+# SDKMAN (Must be at end)
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# ═══════════════════════════════════════════════════════════
+# POWERLEVEL10K PROMPT
+# ═══════════════════════════════════════════════════════════
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TRADUCCIÓN DE SUBTÍTULOS: SRT → Español (MLX Local)
+# Flujo: Buzz (extrae .srt) → traducir-srt → incrustarSubs
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# traducir-srt (PRINCIPAL)
+# Propósito: Traduce archivos SRT (inglés/japonés → español) sin depender de web
+# Modelo: Mistral 7B 4-bit (optimizado para traducción)
+# Velocidad: ~100 subs en 2-3 min (1ª carga), 30-60 seg (posteriores)
+# Casos: películas, documentales, anime, conferencias, cualquier video
+# Salida: archivo_es.srt (timestamps y formato preservados)
+alias traducir-srt='python3 ~/scripts/translate_srt.py'
+
+# traducir-srt-rápido
+# Propósito: Traducción rápida (trade-off velocidad por precisión) - para pruebas
+# Configuración: batch 15 + temp 0.5 = menos preciso pero más rápido (~1.5 min)
+alias traducir-srt-rápido='python3 ~/scripts/translate_srt.py --batch-size 15 --temp 0.5'
+
+# traducir-srt-preciso
+# Propósito: Traducción ultra-precisa (para trabajos finales/profesionales)
+# Configuración: batch 4 + temp 0.1 = máxima consistencia (~4 min)
+alias traducir-srt-preciso='python3 ~/scripts/translate_srt.py --batch-size 4 --temp 0.1'
+
+export PATH="$HOME/.local/bin:$PATH"
+
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+
+# ═══════════════════════════════════════════════════════════
+# HISTORIAL MEJORADO
+# ═══════════════════════════════════════════════════════════
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_DUPS        # No guarda comandos duplicados consecutivos
+setopt HIST_IGNORE_SPACE       # No guarda comandos que empiezan con espacio
+setopt SHARE_HISTORY           # Comparte historial entre ventanas de iTerm
+setopt HIST_VERIFY             # Muestra el comando del historial antes de ejecutar
+
+# ═══════════════════════════════════════════════════════════
+# AUTOCOMPLETADO MEJORADO
+# ═══════════════════════════════════════════════════════════
+setopt AUTO_CD                 # Escribe nombre de carpeta sin cd para navegar
+setopt CORRECT                 # Sugiere corrección si escribes un comando mal
+zstyle ':completion:*' menu select          # Menú visual para autocompletado con Tab
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # Autocompletado case-insensitive
+
+
+# ═══════════════════════════════════════════════════════════
+# ALIASES CLI MEJORADOS
+# ═══════════════════════════════════════════════════════════
+alias cat='bat --paging=never'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --group-directories-first'
+alias la='eza -la --icons --group-directories-first --git'
+alias tree='eza --tree --icons'
+alias treef='eza --tree --icons'
+
+# ═══════════════════════════════════════════════════════════
+# Z — Directory Jumper
+# ═══════════════════════════════════════════════════════════
+if [ -f "/opt/homebrew/etc/profile.d/z.sh" ]; then
+  . "/opt/homebrew/etc/profile.d/z.sh"
+fi

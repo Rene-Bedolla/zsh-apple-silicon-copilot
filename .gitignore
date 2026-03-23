@@ -1,0 +1,13 @@
+# Sistema
+.DS_Store
+.Trash
+
+# Historiales y Caché
+.zsh_history
+.zcompdump*
+.zsh_sessions/
+
+# Archivos de la IA local
+*.log
+.cache/
+
