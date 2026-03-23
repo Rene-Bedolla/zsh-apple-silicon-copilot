@@ -5,60 +5,82 @@
 # AUTOR: René López Bedolla
 # ==============================================================================
 
+set -e  # Salir inmediatamente si algo falla
+
 echo "==========================================================="
-echo "🚀 INICIANDO INSTALACIÓN: ZSH APPLE SILICON COPILOT"
+echo "🚀 INICIANDO INSTALACIÓN: Zsh Apple Silicon Copilot"
 echo "==========================================================="
-echo "Este script configurará tu terminal e instalará las"
-echo "herramientas necesarias (Homebrew, Zsh, MLX, etc)."
+echo "Este script configurará tu terminal completa y automáticamente."
+echo "Instalará: Homebrew, MLX IA, herramientas CLI y tu nueva configuración."
 echo ""
 
-# 1. Instalar Homebrew si no existe
+# 1. INSTALAR HOMEBREW
+echo "🍺 1/7 Instalando Homebrew..."
 if ! command -v brew &> /dev/null; then
-    echo "🍺 1/5 Instalando Homebrew (Te pedirá tu contraseña)..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     eval "$(/opt/homebrew/bin/brew shellenv)"
 else
-    echo "✅ 1/5 Homebrew ya está instalado."
+    echo "   ✅ Homebrew ya está instalado."
 fi
 
-# 2. Instalar dependencias
-echo "📦 2/5 Instalando paquetes esenciales y Zoxide..."
+# 2. INSTALAR HERRAMIENTAS CLI MODERNAS
+echo "📦 2/7 Instalando herramientas CLI modernas..."
 brew install eza bat fzf zoxide python@3.11 ffmpeg jq
+
+# 3. INSTALAR TEMA Y PLUGINS ZSH
+echo "🎨 3/7 Instalando Powerlevel10k y plugins Zsh..."
 brew install romkatv/powerlevel10k/powerlevel10k
 brew install zsh-autosuggestions zsh-syntax-highlighting
 
-# 3. Clonar el repositorio
-echo "📥 3/5 Descargando la configuración de GitHub..."
+# 4. INSTALAR MLX PARA IA LOCAL OFFLINE
+echo "🤖 4/7 Instalando MLX para IA Local (Cerebro de la terminal)..."
+pip3 install --upgrade pip
+pip3 install mlx mlx-lm
+
+# 5. DESCARGAR MODELO DE IA BASE (Qwen3 4B - Rápido y Ligero)
+echo "🧠 5/7 Descargando modelo de IA local (Qwen3 4B)..."
+python3 -c "
+from mlx_lm import load
+model, tokenizer = load('mlx-community/Qwen3-4B-4bit')
+print('✅ Modelo descargado y listo para usar')
+"
+
+# 6. CLONAR EL REPOSITORIO
+echo "📥 6/7 Descargando la configuración desde GitHub..."
 mkdir -p "$HOME/Documents"
-if [ -d "$HOME/Documents/dotfiles" ]; then
-    echo "   ⚠️ La carpeta dotfiles ya existe. Actualizando..."
-    cd "$HOME/Documents/dotfiles" && git pull origin main
+cd "$HOME/Documents"
+if [ -d "dotfiles" ]; then
+    echo "   Actualizando repositorio existente..."
+    cd dotfiles && git pull origin main && cd ..
 else
-    git clone https://github.com/Rene-Bedolla/zsh-apple-silicon-copilot.git "$HOME/Documents/dotfiles"
+    git clone https://github.com/Rene-Bedolla/zsh-apple-silicon-copilot.git dotfiles
 fi
 
-# 4. Configurar Enlaces Simbólicos
-echo "🔗 4/5 Conectando el entorno a la terminal..."
+# 7. CONFIGURAR ENLACES SIMBÓLICOS
+echo "🔗 7/7 Conectando el entorno a la terminal..."
 if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
-    echo "   Respaldando tu .zshrc anterior como .zshrc.backup"
-    mv "$HOME/.zshrc" "$HOME/.zshrc.backup"
+    echo "   Respaldando tu .zshrc anterior..."
+    mv "$HOME/.zshrc" "$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M)"
 fi
 ln -sf "$HOME/Documents/dotfiles/.zshrc" "$HOME/.zshrc"
 
-# 5. Configurar Scripts
-echo "📂 5/5 Configurando scripts globales..."
-if [ ! -d "$HOME/scripts" ]; then
-    cp -R "$HOME/Documents/dotfiles/scripts" "$HOME/"
-else
-    cp -R "$HOME/Documents/dotfiles/scripts/"* "$HOME/scripts/" 2>/dev/null
-fi
+# CONFIGURAR SCRIPTS GLOBALES
+mkdir -p "$HOME/scripts"
+cp -R "$HOME/Documents/dotfiles/scripts/"* "$HOME/scripts/" 2>/dev/null || true
 
 echo "==========================================================="
 echo "🎉 ¡INSTALACIÓN COMPLETADA CON ÉXITO!"
 echo "==========================================================="
-echo "Para activar tu nuevo entorno, abre una nueva ventana"
-echo "de la terminal o ejecuta: source ~/.zshrc"
 echo ""
-echo "💡 Para optimizar tu Mac, puedes ejecutar:"
-echo "   macos-tweaks"
+echo "🔄 Para activar tu nuevo entorno, ejecuta:"
+echo "   source ~/.zshrc"
+echo ""
+echo ""
+echo "💡 Comandos que ahora tienes disponibles:"
+echo "   • explicar 'comando' (IA que explica comandos)"
+echo "   • git-ia (IA que genera mensajes de commit)"
+echo "   • macos-tweaks (optimiza tu Mac)"
+echo "   • nota 'texto' (captura rápida de ideas)"
+echo ""
+echo "📖 Documentación completa: https://github.com/Rene-Bedolla/zsh-apple-silicon-copilot"
 echo "==========================================================="
