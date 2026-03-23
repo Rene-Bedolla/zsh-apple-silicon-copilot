@@ -1,10 +1,9 @@
 # ==============================================================================
 # ARCHIVO: .zshrc
-# PROPÓSITO: Inicialización de ZSH (Arquitectura Modular - Cero Fricción)
+# PROPÓSITO: Inicialización de ZSH (Arquitectura Modular - Zero Friction)
 # ==============================================================================
 
 # 1. Caché e Inicialización Rápida (Powerlevel10k)
-# IMPORTANTE: Esto debe estar en la parte superior para que la terminal abra rápido
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -24,20 +23,27 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # 4. Carga Modular Dinámica (Cero Fricción)
-# Apuntamos a iCloud Drive / Dotfiles para sincronización transversal entre Macs
 ZSH_CONFIG_DIR="$HOME/Documents/dotfiles/.zsh"
 
 if [[ -d "$ZSH_CONFIG_DIR" ]]; then
-    # 4.1 Cargar variables de entorno y alias (nombres seguros anti-colisión)
+    # 4.1 Cargar variables de entorno y alias base
     [[ -f "$ZSH_CONFIG_DIR/01-exports.zsh" ]] && source "$ZSH_CONFIG_DIR/01-exports.zsh"
     [[ -f "$ZSH_CONFIG_DIR/02-aliases.zsh" ]] && source "$ZSH_CONFIG_DIR/02-aliases.zsh"
 
-    # 4.2 Cargar dinámicamente cualquier script en la carpeta de funciones
+    # 4.2 Cargar dinámicamente herramientas de la carpeta /funciones/
     if [[ -d "$ZSH_CONFIG_DIR/funciones" ]]; then
         for func_file in "$ZSH_CONFIG_DIR"/funciones/*.zsh; do
             source "$func_file"
         done
     fi
+fi
+
+# 4.3 Carga del entorno privado (Ignorado por GitHub, solo visible para ti)
+if [[ -d "$HOME/Documents/dotfiles/privado" ]]; then
+    # El modificador (N) evita errores si la carpeta existe pero está vacía
+    for priv_file in "$HOME/Documents/dotfiles/privado"/*.zsh(N); do
+        source "$priv_file"
+    done
 fi
 
 # 5. Herramientas de Navegación Inteligente (Zoxide)
