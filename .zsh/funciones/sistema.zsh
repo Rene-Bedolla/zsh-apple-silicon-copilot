@@ -136,3 +136,57 @@ EOF
     echo "   📄 Archivo: Entorno_Ren_$FECHA.zip"
 }
 
+# -------------------------------------------------------------------
+# git-sync
+# Asistente interactivo paso a paso para respaldar en GitHub.
+# Integra git-ia para generar los mensajes automáticamente.
+# -------------------------------------------------------------------
+function git-sync() {
+    # 1. Verificar si estamos en un repositorio
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+        echo "❌ Error: No estás dentro de un repositorio de Git."
+        return 1
+    fi
+
+    echo "\n📦 Estado actual de tus archivos:"
+    git status -s
+    echo ""
+
+    # Preguntar si deseamos agregar todo (Empacar la caja)
+    if read -q "?¿Deseas agregar todos los cambios (git add .)? [y/N]: "; then
+        echo "\n"
+        git add .
+        echo "✅ Archivos preparados."
+    else
+        echo "\n🛑 Operación cancelada por el usuario."
+        return 1
+    fi
+
+    echo "\n🤖 Consultando a tu IA Local (Qwen3) para sugerir la etiqueta..."
+    # Llamamos a tu propia función de dev_copilot.zsh
+    git-ia 
+
+    echo "\n📝 Escribe el mensaje para tu commit (puedes pegar una opción de arriba):"
+    echo "   (O presiona Enter sin escribir nada para cancelar)"
+    read "MENSAJE"
+
+    if [[ -n "$MENSAJE" ]]; then
+        git commit -m "$MENSAJE"
+        echo "✅ Caja sellada (Commit creado)."
+    else
+        echo "🛑 Cancelado: Un commit requiere un mensaje."
+        # Revertir el 'git add' para dejar el repositorio como estaba
+        git reset HEAD >/dev/null 2>&1
+        return 1
+    fi
+
+    # Preguntar si subimos a GitHub (Llamar a la paquetería)
+    echo ""
+    if read -q "?¿Deseas subir los cambios a GitHub (git push)? [y/N]: "; then
+        echo "\n🚀 Subiendo al servidor..."
+        git push
+        echo "🎉 ¡Sincronización exitosa!"
+    else
+        echo "\n📦 Los cambios están guardados localmente, pero NO se subieron a GitHub."
+    fi
+}
