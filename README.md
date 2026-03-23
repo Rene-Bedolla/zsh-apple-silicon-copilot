@@ -9,7 +9,7 @@
 ![Zsh](https://img.shields.io/badge/Zsh-111?style=for-the-badge&logo=gnubash&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-M1%2FM2%2FM3%2FM4-blue?style=for-the-badge)
 
-Unlike traditional dotfiles, this repository is designed exclusively for **Apple Silicon Macs**. It leverages the [Apple MLX framework](https://github.com/ml-explore/mlx) to run a Local AI Developer Copilot directly on your machine—no API keys, no subscriptions, 100% offline and blazingly fast.
+Unlike traditional dotfiles, this repository is designed exclusively for **Apple Silicon Macs**. It leverages the [Apple MLX framework](https://github.com/ml-explore/mlx) to run a Local AI Developer Copilot directly on your machine—no API keys, no subscriptions, 100% offline and fast.
 
 ## 📦 One-Click Installation
 
