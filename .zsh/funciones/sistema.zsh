@@ -190,3 +190,21 @@ function git-sync() {
         echo "\n📦 Los cambios están guardados localmente, pero NO se subieron a GitHub."
     fi
 }
+
+# -------------------------------------------------------------------
+# reescribir
+# Función para reemplazar rápidamente todo el contenido de un archivo
+# Uso: reescribir ruta/al/archivo
+# -------------------------------------------------------------------
+function reescribir() {
+    if [[ -z "$1" ]]; then
+        echo "❌ Uso: reescribir ruta/al/archivo"
+        return 1
+    fi
+    echo "📝 Pega todo el nuevo contenido ahora."
+    echo "Cuando termines, presiona Enter, luego Ctrl+D."
+    echo "--------------------------------------------------------"
+    cat > "$1"
+    echo "--------------------------------------------------------"
+    echo "✅ Archivo $1 actualizado correctamente."
+}

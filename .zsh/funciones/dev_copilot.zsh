@@ -3,77 +3,37 @@
 # ARCHIVO: dev_copilot.zsh
 # PROPÓSITO: Asistente de Desarrollo impulsado por IA Local en Español
 # MOTOR: MLX (Nativo para Apple Silicon)
-# AUTOR: René López Bedolla
-# VERSIÓN: 2.2 — Fixes: verbose=False bug, diff injection, JSON regex, sampler
 # ==============================================================================
 
 export MLX_COPILOT_MODEL="mlx-community/Qwen3-4B-4bit"
+export MLX_PYTHON="$HOME/.local/bin/mlx_python"
 
-# -------------------------------------------------------------------
-# mlx-check
-# Diagnóstico automático de dependencias MLX. Muestra el estado real.
-# -------------------------------------------------------------------
-function mlx-check() {
-    echo "🔍 DIAGNÓSTICO MLX PARA dev_copilot.zsh"
-    echo ""
-    echo "Python que usa dev_copilot:"
-    echo "  $(which python3)"
-    echo ""
-    echo "Python que instaló pip3:"
-    which pip3 | xargs -I {} dirname {} | xargs -I {} ls {}/python3* 2>/dev/null || echo "No encontrado"
-    echo ""
-    echo "mlx_lm instalado:"
-    python3 -c "import mlx_lm; print('✅ mlx_lm OK')" 2>&1 || echo "❌ mlx_lm NO encontrado"
-    echo ""
-    echo "Modelo descargado:"
-    python3 -c "
-from mlx_lm import load
-model, tokenizer = load('$MLX_COPILOT_MODEL', verbose=False)
-print('✅ Modelo listo')
-" 2>&1 || echo "❌ Problema con el modelo"
-    echo ""
-}
-
-# -------------------------------------------------------------------
-# git-ia
-# Analiza 'git diff' y sugiere 3 mensajes de commit profesionales.
-# -------------------------------------------------------------------
 function git-ia() {
     if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         echo "❌ Error: No estás dentro de un repositorio de Git."
         return 1
     fi
 
-    echo "🔍 Leyendo cambios del código..."
-    local DIFF
-    DIFF=$(git diff HEAD)
-
+    local DIFF=$(git diff HEAD)
     if [[ -z "$DIFF" ]]; then
-        echo "📭 No hay cambios detectados. Guarda archivos o haz 'git add' primero."
+        echo "📭 No hay cambios detectados. Haz 'git add' primero."
         return 1
     fi
 
     echo "⚡ Analizando código con MLX y generando mensajes..."
 
-    # DIFF a archivo temporal para evitar inyección que rompa sys.argv
-    local TMP_DIFF
-    TMP_DIFF=$(mktemp /tmp/mlx_diff_XXXXXX.txt)
+    local TMP_DIFF=$(mktemp /tmp/mlx_diff_XXXXXX.txt)
     echo "$DIFF" | head -c 3000 > "$TMP_DIFF"
 
-    local TMP_SCRIPT
-    TMP_SCRIPT=$(mktemp /tmp/mlx_git_XXXXXX.py)
+    local TMP_SCRIPT=$(mktemp /tmp/mlx_git_XXXXXX.py)
 
-    cat > "$TMP_SCRIPT" << 'EOF'
-import sys
-import io
-import re
-import json
-import contextlib
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys, io, re, json, contextlib
 from mlx_lm import load, generate
 from mlx_lm.sample_utils import make_sampler
 
 model_name = sys.argv[1]
-diff_path  = sys.argv[2]
+diff_path = sys.argv[2]
 
 with open(diff_path, 'r', errors='replace') as f:
     diff_text = f.read()
@@ -82,39 +42,27 @@ prompt_text = (
     "Eres un desarrollador senior. Analiza este git diff y genera 3 opciones "
     "de mensajes de commit (feat, fix, chore, etc). "
     'RESPONDE ÚNICAMENTE CON UN JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA: '
-    '{"commits": ["mensaje 1", "mensaje 2", "mensaje 3"]}. '
-    "NO agregues texto ni explicaciones fuera del JSON. "
-    f"DIFF:\n{diff_text}"
+    '{"commits": ["mensaje 1", "mensaje 2", "mensaje 3"]}. DIFF:\n' + diff_text
 )
 
 try:
     model, tokenizer = load(model_name)
     messages = [{"role": "user", "content": prompt_text}]
-    formatted_prompt = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
+    formatted_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
     sampler = make_sampler(temp=0.1)
     buffer = io.StringIO()
-    
-    with contextlib.redirect_stdout(buffer):
-        generate(
-            model, tokenizer,
-            prompt=formatted_prompt,
-            max_tokens=800,
-            sampler=sampler,
-            verbose=True
-        )
-    raw = buffer.getvalue()
 
+    with contextlib.redirect_stdout(buffer):
+        generate(model, tokenizer, prompt=formatted_prompt, max_tokens=800, sampler=sampler, verbose=True)
+
+    raw = buffer.getvalue()
     stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
     m = stats_pat.search(raw)
     text = raw[:m.start()].strip() if m else raw.strip()
 
-    if "</think>" in text:
-        text = text.split("</think>")[-1].strip()
-    else:
-        text = text.replace("<think>", "").strip()
+    if "</think>" in text: text = text.split("</think>")[-1].strip()
+    else: text = text.replace("<think>", "").strip()
 
     def find_first_json(s):
         decoder = json.JSONDecoder()
@@ -129,17 +77,14 @@ try:
         return None
 
     def extract_list(obj):
-        if isinstance(obj, list):
-            return obj
+        if isinstance(obj, list): return obj
         if isinstance(obj, dict):
             for v in obj.values():
-                result = extract_list(v)
-                if result:
-                    return result
+                res = extract_list(v)
+                if res: return res
         return None
 
     parsed = find_first_json(text)
-
     if parsed:
         commits = extract_list(parsed)
         if commits:
@@ -147,108 +92,55 @@ try:
                 if isinstance(commit, str):
                     print(f"{i}. {commit.replace('`','').strip()}")
                 elif isinstance(commit, dict):
-                    first_val = next(iter(commit.values()), "")
-                    print(f"{i}. {str(first_val).replace('`','').strip()}")
+                    print(f"{i}. {str(next(iter(commit.values()), '')).replace('`','').strip()}")
         else:
-            print("1. chore: actualizar archivos (JSON sin lista de commits)")
+            print("1. chore: actualizar archivos")
     else:
-        lines = [
-            l.strip() for l in text.split('\n')
-            if any(p in l for p in ('feat:', 'fix:', 'chore:', 'docs:', 'refactor:', 'style:'))
-        ]
+        lines = [l.strip() for l in text.split('\n') if any(p in l for p in ('feat:', 'fix:', 'chore:', 'docs:'))]
         if lines:
-            for i, line in enumerate(lines[:3], 1):
-                print(f"{i}. {line}")
+            for i, line in enumerate(lines[:3], 1): print(f"{i}. {line}")
         else:
-            print("1. chore: actualizar archivos (modelo no siguió instrucciones)")
+            print("1. chore: actualizar archivos")
 
 except Exception as e:
-    print(f"❌ Error interno de MLX: {e}", file=sys.stderr)
+    print(f"❌ Error MLX: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
+PYEOF
 
-    local RESPUESTA
-    RESPUESTA=$(python3 "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$TMP_DIFF" 2>/tmp/mlx_error.log)
-    local EXIT_CODE=$?
+    local RESPUESTA=$("$MLX_PYTHON" "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$TMP_DIFF" 2>/tmp/mlx_error.log)
     rm -f "$TMP_SCRIPT" "$TMP_DIFF"
 
-    if [[ $EXIT_CODE -ne 0 ]]; then
-        echo "❌ Error de MLX. Revisa con: cat /tmp/mlx_error.log"
-        return 1
-    fi
-
-    echo "\n=========================================================="
-    echo "💡 SUGERENCIAS DE AUTO-COMMIT:"
-    echo "=========================================================="
-    if command -v bat &>/dev/null; then
-        echo "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
-    else
-        echo "$RESPUESTA"
-    fi
-    echo "=========================================================="
-    echo "👉 Usa una ejecutando: git commit -m 'mensaje'"
-    echo "==========================================================\n"
+    echo "\n💡 SUGERENCIAS DE AUTO-COMMIT:"
+    if command -v bat &>/dev/null; then echo "$RESPUESTA" | bat --style=plain --language=markdown --paging=never; else echo "$RESPUESTA"; fi
 }
 
-# -------------------------------------------------------------------
-# explicar <comando>
-# Consulta a MLX para desglosar y explicar comandos de consola o errores.
-# -------------------------------------------------------------------
 function explicar() {
-    if [[ -z "$1" ]]; then
-        echo "❌ Uso: explicar 'comando o error'"
-        echo "💡 Ejemplo: explicar 'tar -xzvf archivo.tar.gz'"
-        return 1
-    fi
+    if [[ -z "$1" ]]; then return 1; fi
 
-    local CONSULTA="$1"
-    echo "⚡ Analizando comando con Apple Silicon (MLX)..."
+    local PROMPT="Eres un manual de macOS. Analiza el comando '${1}' y responde SOLO con este JSON EXACTO: {\"resumen\": \"una línea corta\", \"sintaxis\": \"ejemplo de uso\", \"opciones\": [\"opción 1\", \"opción 2\"], \"ejemplo\": \"bat archivo.txt\"}."
+    local TMP_SCRIPT=$(mktemp /tmp/mlx_explicar_XXXXXX.py)
 
-    local PROMPT="Eres un manual de macOS. Analiza el comando '${CONSULTA}' y responde SOLO con este JSON EXACTO: {\"resumen\": \"una línea corta\", \"sintaxis\": \"ejemplo de uso\", \"opciones\": [\"opción 1\", \"opción 2\", \"opción 3\"], \"ejemplo\": \"bat archivo.txt\"}. NO escribas nada fuera del JSON."
-
-    local TMP_SCRIPT
-    TMP_SCRIPT=$(mktemp /tmp/mlx_explicar_XXXXXX.py)
-
-    cat > "$TMP_SCRIPT" << 'EOF'
-import sys
-import io
-import re
-import json
-import contextlib
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys, io, re, json, contextlib
 from mlx_lm import load, generate
 from mlx_lm.sample_utils import make_sampler
 
-model_name  = sys.argv[1]
-prompt_text = sys.argv[2]
-
 try:
-    model, tokenizer = load(model_name)
-    messages = [{"role": "user", "content": prompt_text}]
-    formatted_prompt = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
+    model, tokenizer = load(sys.argv[1])
+    messages = [{"role": "user", "content": sys.argv[2]}]
+    formatted_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
     sampler = make_sampler(temp=0.1)
     buffer = io.StringIO()
-    
-    with contextlib.redirect_stdout(buffer):
-        generate(
-            model, tokenizer,
-            prompt=formatted_prompt,
-            max_tokens=600,
-            sampler=sampler,
-            verbose=True
-        )
-    raw = buffer.getvalue()
 
+    with contextlib.redirect_stdout(buffer):
+        generate(model, tokenizer, prompt=formatted_prompt, max_tokens=600, sampler=sampler, verbose=True)
+
+    raw = buffer.getvalue()
     stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
     m = stats_pat.search(raw)
     text = raw[:m.start()].strip() if m else raw.strip()
-
-    if "</think>" in text:
-        text = text.split("</think>")[-1].strip()
-    else:
-        text = text.replace("<think>", "").strip()
+    if "</think>" in text: text = text.split("</think>")[-1].strip()
 
     decoder = json.JSONDecoder()
     data = None
@@ -261,40 +153,20 @@ try:
             idx = text.find('{', idx + 1)
 
     if data:
-        output = f"**Resumen general:**\n{data.get('resumen', 'No disponible')}\n\n"
-        output += f"**Sintaxis:**\n{data.get('sintaxis', 'No disponible')}\n\n"
-        if data.get('opciones'):
-            output += "**Opciones principales:**\n"
-            for opt in data.get('opciones', [])[:10]:
-                output += f"- {opt}\n"
-            output += "\n"
-        output += f"**Ejemplo:**\n{data.get('ejemplo', 'No disponible')}"
-        print(output)
+        print(f"**Resumen general:**\n{data.get('resumen', 'No disponible')}\n\n**Sintaxis:**\n{data.get('sintaxis', 'No disponible')}\n\n**Opciones principales:**")
+        for opt in data.get('opciones', [])[:10]: print(f"- {opt}")
+        print(f"\n**Ejemplo:**\n{data.get('ejemplo', 'No disponible')}")
     else:
-        print(text if text else "El modelo no generó una respuesta estructurada.")
+        print(text if text else "Error de formato")
 
 except Exception as e:
-    print(f"❌ Error interno de MLX: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
+PYEOF
 
-    local RESPUESTA
-    RESPUESTA=$(python3 "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$PROMPT" 2>/tmp/mlx_error.log)
-    local EXIT_CODE=$?
+    echo "⚡ Analizando comando con Apple Silicon (MLX)..."
+    local RESPUESTA=$("$MLX_PYTHON" "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$PROMPT" 2>/tmp/mlx_error.log)
     rm -f "$TMP_SCRIPT"
 
-    if [[ $EXIT_CODE -ne 0 ]]; then
-        echo "❌ Error de MLX. Revisa con: cat /tmp/mlx_error.log"
-        return 1
-    fi
-
-    echo "\n=========================================================="
-    echo "💡 EXPLICACIÓN DEL COMANDO:"
-    echo "=========================================================="
-    if command -v bat &>/dev/null; then
-        echo "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
-    else
-        echo "$RESPUESTA"
-    fi
-    echo "==========================================================\n"
+    echo "\n💡 EXPLICACIÓN DEL COMANDO:"
+    if command -v bat &>/dev/null; then echo "$RESPUESTA" | bat --style=plain --language=markdown --paging=never; else echo "$RESPUESTA"; fi
 }
