@@ -29,8 +29,10 @@ alias python3=/opt/homebrew/opt/python@3.11/libexec/bin/python3
 alias pip=/opt/homebrew/opt/python@3.11/libexec/bin/pip3
 
 # ─── IA y Automatización Pública (MLX) ────────────────────────────
-alias traducir-srt='python3 ~/scripts/translate_srt.py'
+# FIX: Nueva ruta al script de traducción en dotfiles
+alias traducir-srt='python3 ~/Documents/dotfiles/scripts/translate_srt.py'
 alias transcribir-video='extraerSubs'
 alias transcribir-rápido='extraerSubs $1 tiny'
 
 alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.1 --prompt "Actúa como un analista experto. Lee la siguiente transcripción y extrae de forma estructurada: 1) Resumen (3 viñetas), 2) Tareas asignadas, 3) Puntos críticos. Mantén la objetividad estricta sin inventar datos: "'
+
