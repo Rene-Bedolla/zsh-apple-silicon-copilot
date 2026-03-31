@@ -170,3 +170,47 @@ PYEOF
     echo "\n💡 EXPLICACIÓN DEL COMANDO:"
     if command -v bat &>/dev/null; then echo "$RESPUESTA" | bat --style=plain --language=markdown --paging=never; else echo "$RESPUESTA"; fi
 }
+
+# -------------------------------------------------------------------
+# conversar-mantener
+# Panel de mantenimiento para MLX: actualiza paquetes y lista modelos.
+# -------------------------------------------------------------------
+function conversar-mantener() {
+    echo "\n🔧 Mantenimiento IA Local MLX"
+    echo "=========================================================="
+
+    # 1. Actualizar paquetes Python
+    echo "\n📦 1/3 Actualizando mlx-lm..."
+    pip install --upgrade mlx-lm --quiet \
+        && echo "   ✅ mlx-lm actualizado" \
+        || echo "   ❌ Error al actualizar mlx-lm"
+
+    echo "📦     Actualizando mlx-vlm..."
+    pip install --upgrade mlx-vlm --quiet \
+        && echo "   ✅ mlx-vlm actualizado" \
+        || echo "   ❌ Error al actualizar mlx-vlm"
+
+    # 2. Versiones instaladas
+    echo "\n📋 2/3 Versiones activas:"
+    echo "   mlx-lm  → $(pip show mlx-lm 2>/dev/null | grep Version | awk '{print $2}')"
+    echo "   mlx-vlm → $(pip show mlx-vlm 2>/dev/null | grep Version | awk '{print $2}')"
+
+    # 3. Modelos en caché local con su tamaño en disco
+    echo "\n🗂️  3/3 Modelos descargados en caché local:"
+    local cachedir="$HOME/.cache/huggingface/hub"
+    if [[ -d "$cachedir" ]]; then
+        for modelo in "$cachedir"/models--mlx-community--*/; do
+            local nombre=$(basename "$modelo" | sed 's/models--mlx-community--//')
+            local tamano=$(du -sh "$modelo" 2>/dev/null | awk '{print $1}')
+            echo "   📁 $nombre ($tamano)"
+        done
+    else
+        echo "   ⚠️  No se encontró el directorio de caché."
+    fi
+
+    echo "\n=========================================================="
+    echo "💡 Para reemplazar un modelo descarga el nuevo con:"
+    echo "   mlx_lm.generate --model mlx-community/NUEVO-MODELO --prompt 'Hola'"
+    echo "   y actualiza MLX_COPILOT_MODEL en dev_copilot.zsh"
+    echo "==========================================================\n"
+}
