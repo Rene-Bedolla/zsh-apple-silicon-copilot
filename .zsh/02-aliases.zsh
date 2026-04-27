@@ -45,3 +45,9 @@ alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max
 # -------------------------------------------------------------------
 alias cal='carl'
 alias calagenda='carl -n 3 --agenda'
+
+# ── Xcode / Desarrollo iOS ──────────────────────────────────────────
+alias xdev="cd /Volumes/T7/Developer/Xcode"
+alias xproj="cd /Volumes/T7/Developer/Xcode/Proyectos"
+alias xdemos="cd /Volumes/T7/Developer/Xcode/Demos"
+alias xsand="cd /Volumes/T7/Developer/Xcode/Sandbox"
