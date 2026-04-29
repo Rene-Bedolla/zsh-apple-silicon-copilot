@@ -67,40 +67,6 @@ conversar() {
   esac
 }
 
-# -------------------------------------------------------------------
-# conversar-mantener()
-# Utilidad de diagnóstico y actualización de dependencias MLX
-# -------------------------------------------------------------------
-conversar-mantener() {
-  echo "\n  ╔══════════════════════════════════════════════════════════╗"
-  echo "  ║       🔧  Mantenimiento IA Local · MLX                   ║"
-  echo "  ╚══════════════════════════════════════════════════════════╝\n"
-
-  echo "  📦 Actualizando mlx-lm..."
-  pip install --upgrade mlx-lm --quiet && echo "  ✅ mlx-lm actualizado" || echo "  ❌ Error al actualizar mlx-lm"
-
-  echo "  📦 Actualizando mlx-vlm..."
-  pip install --upgrade mlx-vlm --quiet && echo "  ✅ mlx-vlm actualizado" || echo "  ❌ Error al actualizar mlx-vlm"
-
-  echo "\n  📋 Versiones activas:"
-  echo "     mlx-lm  : $(pip show mlx-lm 2>/dev/null | grep Version | awk '{print $2}')"
-  echo "     mlx-vlm : $(pip show mlx-vlm 2>/dev/null | grep Version | awk '{print $2}')"
-
-  echo "\n  🗂️  Modelos descargados en caché:"
-  local cache_dir="$HOME/.cache/huggingface/hub"
-  if [[ -d "$cache_dir" ]]; then
-    for modelo in "$cache_dir"/models--mlx-community--*/; do
-      local nombre=$(basename "$modelo" | sed 's/models--mlx-community--//')
-      local tamaño=$(du -sh "$modelo" 2>/dev/null | awk '{print $1}')
-      echo "     • $nombre  ($tamaño)"
-    done
-  else
-    echo "     (No se encontró el directorio de caché)"
-  fi
-
-  echo "\n  ⚠️  Los modelos MLX no se actualizan automáticamente."
-  echo "     Los nuevos releases aparecen en: https://huggingface.co/mlx-community\n"
-}
 
 # Utilidades no interactivas
 alias conversar-generar='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 3000 --temp 0.6 --top-p 0.9'
