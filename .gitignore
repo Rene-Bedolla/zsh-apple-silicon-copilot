@@ -25,3 +25,6 @@ config/nvim/undodir/
 config/nvim/swap/
 config/nvim/backup/
 config/nvim/.netrwhist
+
+# MCP servers con repositorio propio
+.zsh/mcp-apple-notes/
