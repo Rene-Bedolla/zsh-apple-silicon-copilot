@@ -2,6 +2,7 @@
 # ==============================================================================
 # ARCHIVO: 02-aliases.zsh
 # PROPÓSITO: Atajos de teclado y comandos de uso frecuente (VERSIÓN PÚBLICA)
+# ÚLTIMA REVISIÓN: 2026-05-04
 # ==============================================================================
 
 # ─── Sistema y Homebrew ───────────────────────────────────────────
@@ -23,7 +24,13 @@ alias la='eza -la --icons --group-directories-first --git'
 alias tree='eza --tree --icons'
 alias treef='eza --tree --icons'
 
-# ─── Python (Homebrew) ────────────────────────────────────────────
+# ─── Editor de Texto ──────────────────────────────────────────────
+# neovim: sucesor moderno de vim, config en dotfiles/config/nvim/
+# El /usr/bin/vim del sistema sigue existiendo pero estos alias lo interceptan
+alias vim='nvim'
+alias vi='nvim'
+
+# ─── Python (Homebrew 3.11 — intérprete único activo) ─────────────
 alias python=/opt/homebrew/opt/python@3.11/libexec/bin/python3
 alias python3=/opt/homebrew/opt/python@3.11/libexec/bin/python3
 alias pip=/opt/homebrew/opt/python@3.11/libexec/bin/pip3
@@ -36,7 +43,6 @@ alias transcribir-rápido='extraerSubs $1 tiny'
 
 alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.1 --prompt "Actúa como un analista experto. Lee la siguiente transcripción y extrae de forma estructurada: 1) Resumen (3 viñetas), 2) Tareas asignadas, 3) Puntos críticos. Mantén la objetividad estricta sin inventar datos: "'
 
-
 # -------------------------------------------------------------------
 # cal → carl
 # Descripción: Sustituye cal por carl con colores y soporte iCal.
@@ -46,7 +52,7 @@ alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max
 alias cal='carl'
 alias calagenda='carl -n 3 --agenda'
 
-# ── Xcode / Desarrollo iOS ──────────────────────────────────────────
+# ─── Xcode / Desarrollo iOS ───────────────────────────────────────
 alias xdev="cd /Volumes/T7/Developer/Xcode"
 alias xproj="cd /Volumes/T7/Developer/Xcode/Proyectos"
 alias xdemos="cd /Volumes/T7/Developer/Xcode/Demos"

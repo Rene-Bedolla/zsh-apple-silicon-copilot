@@ -19,3 +19,9 @@ privado/
 *.seguro
 *.backup
 *.bak
+
+# Neovim — directorios generados en tiempo de ejecución (no subir al repo)
+config/nvim/undodir/
+config/nvim/swap/
+config/nvim/backup/
+config/nvim/.netrwhist
