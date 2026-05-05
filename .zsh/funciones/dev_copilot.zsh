@@ -354,3 +354,348 @@ function conversar-mantener() {
     printf "\n  🤖 MLX_COPILOT_MODEL activo : %s\n" "$MLX_COPILOT_MODEL"
     printf "  📎 Nuevos modelos           : https://huggingface.co/mlx-community\n\n"
 }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# preguntar
+# Descripción: Copiloto libre. Envía cualquier pregunta a Qwen3-4B local
+#              y retorna respuesta en Markdown formateada con bat.
+# Uso: preguntar "¿Cómo funciona rsync con --checksum?"
+#      preguntar "explícame la diferencia entre TCP y UDP"
+# ─────────────────────────────────────────────────────────────────────────────
+function preguntar() {
+    if [[ -z "$1" ]]; then
+        printf "❌ Uso: preguntar \"tu pregunta aquí\"\\n"
+        return 1
+    fi
+
+    local PREGUNTA="$*"
+    local TMP_SCRIPT
+    TMP_SCRIPT=$(mktemp /tmp/mlx_ask_XXXXXX.py)
+
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys, io, re, contextlib
+from mlx_lm import load, generate
+from mlx_lm.sample_utils import make_sampler
+
+model, tokenizer = load(sys.argv[1])
+pregunta = sys.argv[2]
+
+# Qwen3 con /no_think para respuestas directas (sin cadena de razonamiento lenta)
+messages = [{"role": "user", "content": pregunta + " /no_think"}]
+prompt = tokenizer.apply_chat_template(
+    messages, tokenize=False, add_generation_prompt=True
+)
+
+sampler = make_sampler(temp=0.3)
+buffer  = io.StringIO()
+
+with contextlib.redirect_stdout(buffer):
+    generate(model, tokenizer, prompt=prompt,
+             max_tokens=1200, sampler=sampler, verbose=True)
+
+raw = buffer.getvalue()
+
+# Extraer solo la respuesta (sin stats de MLX)
+stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
+m    = stats_pat.search(raw)
+text = raw[:m.start()].strip() if m else raw.strip()
+
+# Limpiar bloques <think> de Qwen3 si aparecen
+if "</think>" in text:
+    text = text.split("</think>")[-1].strip()
+else:
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
+
+print(text if text else "Sin respuesta.")
+PYEOF
+
+    printf "⚡ Consultando Qwen3 local (MLX)...\\n\\n"
+
+    local RESPUESTA exit_code
+    RESPUESTA=$("$MLX_PYTHON" "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$PREGUNTA" 2>/tmp/mlx_error.log)
+    exit_code=$?
+    rm -f "$TMP_SCRIPT"
+
+    if (( exit_code != 0 )) || [[ -z "$RESPUESTA" ]]; then
+        printf "❌ Sin respuesta. Revisa: cat /tmp/mlx_error.log\\n"
+        return 1
+    fi
+
+    printf "💬 RESPUESTA:\\n"
+    if command -v bat &>/dev/null; then
+        printf '%s\n' "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
+    else
+        printf '%s\n' "$RESPUESTA"
+    fi
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# corregir
+# Descripción: Diagnostica errores/tracebacks. Acepta texto por argumento
+#              o desde stdin (pipe). Qwen3 analiza causa raíz y solución.
+# Uso: corregir "ModuleNotFoundError: No module named 'chromadb'"
+#      cat /tmp/mlx_error.log | corregir
+#      python3 script.py 2>&1 | corregir
+# ─────────────────────────────────────────────────────────────────────────────
+function corregir() {
+    local ERROR_TEXT
+
+    # Aceptar desde stdin (pipe) o argumento directo
+    if [[ ! -t 0 ]]; then
+        ERROR_TEXT=$(cat)
+    elif [[ -n "$1" ]]; then
+        ERROR_TEXT="$*"
+    else
+        printf "❌ Uso: corregir \"error aquí\" — o — cat log.txt | corregir\\n"
+        return 1
+    fi
+
+    local TMP_SCRIPT TMP_ERR
+    TMP_SCRIPT=$(mktemp /tmp/mlx_fix_XXXXXX.py)
+    TMP_ERR=$(mktemp /tmp/mlx_err_XXXXXX.txt)
+    printf '%s' "$ERROR_TEXT" | head -c 3000 > "$TMP_ERR"
+
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys, io, re, contextlib
+from mlx_lm import load, generate
+from mlx_lm.sample_utils import make_sampler
+
+model, tokenizer = load(sys.argv[1])
+error_path = sys.argv[2]
+
+with open(error_path, 'r', errors='replace') as f:
+    error_text = f.read()
+
+prompt_text = (
+    "Eres un experto en depuración de código Python/Zsh/macOS. "
+    "Analiza este error y responde en español con: "
+    "1) Causa raíz en una línea, "
+    "2) Solución paso a paso (máximo 4 pasos), "
+    "3) Comando exacto para corregirlo si aplica. "
+    "Sé conciso y directo. ERROR:\\n" + error_text + " /no_think"
+)
+
+messages = [{"role": "user", "content": prompt_text}]
+prompt = tokenizer.apply_chat_template(
+    messages, tokenize=False, add_generation_prompt=True
+)
+
+sampler = make_sampler(temp=0.1)
+buffer  = io.StringIO()
+
+with contextlib.redirect_stdout(buffer):
+    generate(model, tokenizer, prompt=prompt,
+             max_tokens=800, sampler=sampler, verbose=True)
+
+raw = buffer.getvalue()
+stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
+m    = stats_pat.search(raw)
+text = raw[:m.start()].strip() if m else raw.strip()
+
+if "</think>" in text:
+    text = text.split("</think>")[-1].strip()
+else:
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
+
+print(text if text else "Sin diagnóstico.")
+PYEOF
+
+    printf "🔍 Diagnosticando con Qwen3 local...\\n\\n"
+
+    local RESPUESTA exit_code
+    RESPUESTA=$("$MLX_PYTHON" "$TMP_SCRIPT" "$MLX_COPILOT_MODEL" "$TMP_ERR" 2>/tmp/mlx_error.log)
+    exit_code=$?
+    rm -f "$TMP_SCRIPT" "$TMP_ERR"
+
+    if (( exit_code != 0 )) || [[ -z "$RESPUESTA" ]]; then
+        printf "❌ Sin diagnóstico. Revisa: cat /tmp/mlx_error.log\\n"
+        return 1
+    fi
+
+    printf "🩺 DIAGNÓSTICO:\\n"
+    if command -v bat &>/dev/null; then
+        printf '%s\n' "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
+    else
+        printf '%s\n' "$RESPUESTA"
+    fi
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# transcribir
+# Descripción: Transcribe archivo de audio local con mlx-whisper (STT offline).
+#              Soporta cualquier formato que ffmpeg pueda leer (mp3, wav, m4a, ogg).
+# Uso: transcribir archivo.m4a
+#      transcribir ~/Downloads/reunion.mp3
+#      transcribir nota.wav --idioma es   (forzar idioma)
+# ─────────────────────────────────────────────────────────────────────────────
+function transcribir() {
+    if [[ -z "$1" ]]; then
+        printf "❌ Uso: transcribir <archivo.audio> [--idioma es|en|...]\n"
+        return 1
+    fi
+
+    local ARCHIVO="$1"
+    local IDIOMA="${${@[(r)--idioma]}:+${@[$((${@[(i)--idioma]}+1))]}}"
+    IDIOMA="${IDIOMA:-es}"   # español por defecto
+
+    if [[ ! -f "$ARCHIVO" ]]; then
+        printf "❌ Archivo no encontrado: %s\\n" "$ARCHIVO"
+        return 1
+    fi
+
+    # Verificar mlx-whisper disponible
+    if ! "$MLX_PYTHON" -c "import mlx_whisper" 2>/dev/null; then
+        printf "❌ mlx-whisper no instalado. Instala con:\\n"
+        printf "   pip install mlx-whisper\\n"
+        return 1
+    fi
+
+    local TMP_SCRIPT
+    TMP_SCRIPT=$(mktemp /tmp/mlx_stt_XXXXXX.py)
+
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys
+import mlx_whisper
+
+archivo  = sys.argv[1]
+idioma   = sys.argv[2] if len(sys.argv) > 2 else "es"
+
+# whisper-small-mlx: modelo ligero en caché (~80MB), buena calidad en español
+resultado = mlx_whisper.transcribe(
+    archivo,
+    path_or_hf_repo="mlx-community/whisper-small-mlx",
+    language=idioma,
+    word_timestamps=False
+)
+
+# Imprimir solo el texto limpio
+print(resultado.get("text", "").strip())
+PYEOF
+
+    printf "🎙️  Transcribiendo con mlx-whisper (idioma: %s)...\\n\\n" "$IDIOMA"
+
+    local TEXTO exit_code
+    TEXTO=$("$MLX_PYTHON" "$TMP_SCRIPT" "$ARCHIVO" "$IDIOMA" 2>/tmp/mlx_stt_error.log)
+    exit_code=$?
+    rm -f "$TMP_SCRIPT"
+
+    if (( exit_code != 0 )) || [[ -z "$TEXTO" ]]; then
+        printf "❌ Error al transcribir. Revisa: cat /tmp/mlx_stt_error.log\\n"
+        return 1
+    fi
+
+    printf "📝 TRANSCRIPCIÓN:\\n\\n"
+    printf '%s\n' "$TEXTO"
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# nota-voz
+# Descripción: Graba audio desde el micrófono, transcribe con mlx-whisper
+#              y guarda como nota Obsidian con fecha/hora automática.
+#              Requiere sox (brew install sox) para grabación desde terminal.
+# Uso: nota-voz              → graba hasta Ctrl+C, guarda en Obsidian Inbox
+#      nota-voz --segundos 30  → graba exactamente 30 segundos
+#      nota-voz --carpeta "REUNIONES"  → subcarpeta en bóveda
+# ─────────────────────────────────────────────────────────────────────────────
+function nota-voz() {
+    # Verificar sox para grabación
+    if ! command -v sox &>/dev/null; then
+        printf "❌ sox no instalado. Instala con:\\n"
+        printf "   brew install sox\\n"
+        return 1
+    fi
+
+    # Verificar mlx-whisper
+    if ! "$MLX_PYTHON" -c "import mlx_whisper" 2>/dev/null; then
+        printf "❌ mlx-whisper no encontrado.\\n"
+        return 1
+    fi
+
+    # Parsear argumentos opcionales
+    local SEGUNDOS=0
+    local CARPETA="000 - 📥 INBOX"
+    local i=1
+    while (( i <= $# )); do
+        case "${@[$i]}" in
+            --segundos) (( i++ )); SEGUNDOS="${@[$i]}" ;;
+            --carpeta)  (( i++ )); CARPETA="${@[$i]}" ;;
+        esac
+        (( i++ ))
+    done
+
+    local TIMESTAMP
+    TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+    local TMP_AUDIO="/tmp/nota_voz_${TIMESTAMP}.wav"
+    local BOVEDA="/Users/ren/Notas"
+    local DESTINO="${BOVEDA}/${CARPETA}"
+
+    mkdir -p "$DESTINO"
+
+    printf "🎙️  Grabando nota de voz"
+    if (( SEGUNDOS > 0 )); then
+        printf " (%d segundos)...\\n" "$SEGUNDOS"
+        # Grabar duración fija: 1 canal, 16kHz, 16-bit (formato óptimo para Whisper)
+        sox -d -r 16000 -c 1 -b 16 "$TMP_AUDIO" trim 0 "$SEGUNDOS"
+    else
+        printf " — Presiona Ctrl+C para detener\\n"
+        # Grabar hasta interrupción manual
+        sox -d -r 16000 -c 1 -b 16 "$TMP_AUDIO" &
+        local SOX_PID=$!
+        trap "kill $SOX_PID 2>/dev/null; trap - INT" INT
+        wait $SOX_PID
+        trap - INT
+    fi
+
+    if [[ ! -f "$TMP_AUDIO" ]]; then
+        printf "❌ Grabación fallida o sin audio.\\n"
+        return 1
+    fi
+
+    printf "\\n⚡ Transcribiendo con mlx-whisper...\\n"
+
+    local TMP_SCRIPT
+    TMP_SCRIPT=$(mktemp /tmp/mlx_voz_XXXXXX.py)
+    cat > "$TMP_SCRIPT" << 'PYEOF'
+import sys, mlx_whisper
+resultado = mlx_whisper.transcribe(
+    sys.argv[1],
+    path_or_hf_repo="mlx-community/whisper-small-mlx",
+    language="es",
+    word_timestamps=False
+)
+print(resultado.get("text", "").strip())
+PYEOF
+
+    local TEXTO exit_code
+    TEXTO=$("$MLX_PYTHON" "$TMP_SCRIPT" "$TMP_AUDIO" 2>/tmp/mlx_stt_error.log)
+    exit_code=$?
+    rm -f "$TMP_SCRIPT" "$TMP_AUDIO"
+
+    if (( exit_code != 0 )) || [[ -z "$TEXTO" ]]; then
+        printf "❌ Error en transcripción.\\n"
+        return 1
+    fi
+
+    # Nombre de nota con fecha/hora — formato Obsidian Daily Note compatible
+    local NOMBRE_NOTA="Nota de voz ${TIMESTAMP}.md"
+    local RUTA_NOTA="${DESTINO}/${NOMBRE_NOTA}"
+
+    # Escribir nota con frontmatter YAML para Obsidian
+    cat > "$RUTA_NOTA" << MDEOF
+---
+fecha: $(date +"%Y-%m-%d")
+hora: $(date +"%H:%M")
+tipo: nota-voz
+tags: [voz, inbox]
+---
+
+# Nota de voz — $(date +"%d/%m/%Y %H:%M")
+
+${TEXTO}
+MDEOF
+
+    printf "\\n✅ Nota guardada:\\n"
+    printf "   📂 %s\\n\\n" "$RUTA_NOTA"
+    printf "📝 Transcripción:\\n"
+    printf '%s\n' "$TEXTO"
+}
