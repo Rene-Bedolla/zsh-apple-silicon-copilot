@@ -50,17 +50,50 @@ alias xproj="cd /Volumes/T7/Developer/Xcode/Proyectos"
 alias xdemos="cd /Volumes/T7/Developer/Xcode/Demos"
 alias xsand="cd /Volumes/T7/Developer/Xcode/Sandbox"
 
+
 # ─── HERMES Harness ───────────────────────────────────────────────────────────
-# Orquestador multiagente local — Mac Mini M4, Python 3.11, MLX
+# Orquestador IA personal — Mac Mini M4, Python 3.11, MLX
+# Dashboard: http://192.168.1.243:8421  |  Proxy NAS: https://renbedolla.synology.me/hermes
 # Docs: ~/Documents/dotfiles/hermes/README.md
 
-# Ciclo de vida del harness
+# ── Ciclo de vida del harness ─────────────────────────────────────────────────
 alias hermes-init='bash ~/Documents/dotfiles/hermes/init.sh'
 alias hermes-tareas='python3 ~/Documents/dotfiles/hermes/agents/orchestrator.py --listar'
 alias hermes-run='python3 ~/Documents/dotfiles/hermes/agents/orchestrator.py'
 alias hermes-status='hermes-init && mlx-status && hermes-router-status'
 
-# Dashboard web local — puerto 8421, accesible en http://192.168.1.243:8421
-alias hermes-dashboard-on='python3 ~/Documents/dotfiles/hermes/dashboard.py &>/tmp/hermes-dashboard.log & echo "✅ HERMES Dashboard → http://127.0.0.1:8421 (PID: $!)"'
-alias hermes-dashboard-off='pkill -f "hermes/dashboard.py" && echo "🔴 HERMES Dashboard detenido" || echo "⚠️  No había proceso activo"'
-alias hermes-dashboard-log='tail -30 /tmp/hermes-dashboard.log'
+# ── Dashboard web — puerto 8421 ───────────────────────────────────────────────
+alias hermes-dashboard-on='() {
+  local PREV_PID
+  PREV_PID=$(lsof -ti tcp:8421 2>/dev/null)
+  if [[ -n "$PREV_PID" ]]; then
+    kill -9 $PREV_PID 2>/dev/null
+    sleep 1
+  fi
+
+  python3 ~/Documents/dotfiles/hermes/dashboard.py &>/tmp/hermes-dashboard.log &
+  sleep 2
+
+  if lsof -ti tcp:8421 >/dev/null 2>&1; then
+    echo "✅ HERMES Dashboard activo en :8421"
+  else
+    echo "❌ Dashboard no levantó — revisa: hermes-dashboard-log"
+  fi
+}'
+
+alias hermes-dashboard-off='() {
+  local PIDS
+  PIDS=$(lsof -ti tcp:8421 2>/dev/null)
+  if [[ -n "$PIDS" ]]; then
+    kill -9 $PIDS 2>/dev/null
+    sleep 1
+  fi
+  if lsof -ti tcp:8421 >/dev/null 2>&1; then
+    echo "❌ No se pudo liberar :8421"
+  else
+    echo "🔴 HERMES Dashboard detenido"
+  fi
+}'
+alias hermes-dashboard-status='lsof -ti tcp:8421 &>/dev/null && echo "✅ Dashboard activo en :8421" || echo "🔴 Dashboard inactivo"'
+alias hermes-dashboard-log='tail -40 /tmp/hermes-dashboard.log'
+

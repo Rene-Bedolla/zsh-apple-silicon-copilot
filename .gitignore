@@ -28,3 +28,13 @@ config/nvim/.netrwhist
 
 # MCP servers con repositorio propio
 .zsh/mcp-apple-notes/
+
+# ══════════════════════════════════════════════
+# HERMES HARNESS — Datos privados (nunca publicar)
+# ══════════════════════════════════════════════
+hermes/privado/
+hermes/progress/
+hermes/agents.md.bak*
+hermes/*_backup_*.md
+hermes/.env
+hermes/privado.env

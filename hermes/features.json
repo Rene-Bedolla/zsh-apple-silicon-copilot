@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "proyecto": "HERMES Personal Harness",
+  "descripcion": "Tablero de tareas para el orquestador multiagente",
+  "tareas": [
+    {
+      "id": "H-001",
+      "titulo": "Configurar WhatsApp gateway en Hermes",
+      "estado": "pendiente",
+      "prioridad": "media",
+      "agente": "implementer",
+      "modelo": "local-fast",
+      "criterios_aceptacion": [
+        "hermes gateway status muestra WhatsApp activo",
+        "bot responde desde WhatsApp en iPhone"
+      ],
+      "contexto_minimo": "Hermes Agent v0.12.0, Mac Mini M4, ya tiene Telegram activo"
+    },
+    {
+      "id": "H-002",
+      "titulo": "Crear skill de resumen diario automático",
+      "estado": "pendiente",
+      "prioridad": "baja",
+      "agente": "implementer",
+      "modelo": "local-deep",
+      "criterios_aceptacion": [
+        "cron job ejecuta a las 8am",
+        "resumen llega por Telegram",
+        "incluye tareas pendientes del features.json"
+      ],
+      "contexto_minimo": "Hermes Agent skills + cron, Python 3.11, MLX local"
+    }
+  ]
+}
