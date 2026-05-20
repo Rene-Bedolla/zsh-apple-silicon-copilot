@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "proyecto": "HERMES Personal Harness",
+  "descripcion": "Tablero de tareas para el orquestador multiagente",
+  "tareas": [
+    {
+      "id": "H-002",
+      "titulo": "Automatizar resumen diario por Telegram",
+      "estado": "pendiente",
+      "prioridad": "baja",
+      "agente": "implementer",
+      "modelo": "local-deep",
+      "criterios_aceptacion": [
+        "Cron job ejecuta a las 8am",
+        "Resumen llega por Telegram",
+        "Incluye tareas pendientes desde features.json"
+      ],
+      "contexto_minimo": "El skill resumen_texto ya existe; falta automatización, envío y lectura del backlog"
+    }
+  ]
+}

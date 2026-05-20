@@ -97,3 +97,8 @@ alias hermes-dashboard-off='() {
 alias hermes-dashboard-status='lsof -ti tcp:8421 &>/dev/null && echo "✅ Dashboard activo en :8421" || echo "🔴 Dashboard inactivo"'
 alias hermes-dashboard-log='tail -40 /tmp/hermes-dashboard.log'
 
+
+# HERMES — Gateway / Kill Switch
+alias hermes-gateway-on='hermes gateway start'
+alias hermes-gateway-off='hermes gateway stop'
+alias hermes-gateway-status='hermes gateway status'

@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "proyecto": "HERMES Personal Harness",
+  "descripcion": "Tablero de tareas para el orquestador multiagente",
+  "tareas": [
+    {
+      "id": "H-001",
+      "titulo": "Evaluar WhatsApp gateway para Hermes",
+      "estado": "pendiente",
+      "prioridad": "baja",
+      "agente": "implementer",
+      "modelo": "openrouter-default",
+      "criterios_aceptacion": [
+        "Existe justificación clara para usar WhatsApp además de Telegram",
+        "Se documentan costos, límites y complejidad operativa",
+        "Se decide explícitamente si se implementa o se congela"
+      ],
+      "contexto_minimo": "Telegram ya cubre acceso móvil principal; OpenRouter es backend actual del gateway"
+    },
+    {
+      "id": "H-002",
+      "titulo": "Automatizar resumen diario por Telegram",
+      "estado": "pendiente",
+      "prioridad": "baja",
+      "agente": "implementer",
+      "modelo": "local-deep",
+      "criterios_aceptacion": [
+        "cron job ejecuta a las 8am",
+        "resumen llega por Telegram",
+        "incluye tareas pendientes del features.json"
+      ],
+      "contexto_minimo": "El skill resumen_texto ya existe; falta automatización, envío y lectura del backlog"
+    }
+  ]
+}

@@ -18,15 +18,13 @@ from pathlib import Path
 from urllib.parse import unquote
 
 # ── Rutas base del harness ─────────────────────────────────────────────────────
-HERMES_DIR = Path(
-    os.environ.get("HERMES_DIR", str(Path.home() / "Documents/dotfiles/hermes"))
-).expanduser().resolve()
+HERMES_DIR = Path.home() / "Documents/dotfiles/hermes"
 FEATURES_FILE = HERMES_DIR / "features.json"
 PROGRESS_DIR = HERMES_DIR / "progress"
 NEXUS_FILE = HERMES_DIR / "Nexus.md"
 
 # ── Configuración de red ───────────────────────────────────────────────────────
-HOST = os.environ.get("HERMES_HOST", "127.0.0.1")
+HOST = "0.0.0.0"
 PORT = int(os.environ.get("HERMES_PORT", "8421"))
 
 # ── Utilidades de lectura ──────────────────────────────────────────────────────

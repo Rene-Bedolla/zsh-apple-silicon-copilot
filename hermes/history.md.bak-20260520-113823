@@ -1,0 +1,25 @@
+---
+version: "1.0"
+actualizado: "2026-05-19"
+publico: true
+---
+
+# HERMES — Historial de Sesiones
+
+> Registro mínimo de arranques del harness y sesiones clave.
+> Cada entrada corresponde a una ejecución de init.sh u otros eventos importantes.
+
+
+## 2026-05-19 14:05:56 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1779221155}, {"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1779221155}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1779221155}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-05-19 16:24:59 — init.sh
+
+- resultado: 10 OK, 1 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1779229497}, {"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1779229497}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1779229497}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=false

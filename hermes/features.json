@@ -4,31 +4,24 @@
   "descripcion": "Tablero de tareas para el orquestador multiagente",
   "tareas": [
     {
-      "id": "H-001",
-      "titulo": "Configurar WhatsApp gateway en Hermes",
-      "estado": "pendiente",
-      "prioridad": "media",
-      "agente": "implementer",
-      "modelo": "local-fast",
-      "criterios_aceptacion": [
-        "hermes gateway status muestra WhatsApp activo",
-        "bot responde desde WhatsApp en iPhone"
-      ],
-      "contexto_minimo": "Hermes Agent v0.12.0, Mac Mini M4, ya tiene Telegram activo"
-    },
-    {
       "id": "H-002",
-      "titulo": "Crear skill de resumen diario automático",
-      "estado": "pendiente",
+      "titulo": "Resumen diario por Telegram",
+      "estado": "cerrado",
       "prioridad": "baja",
       "agente": "implementer",
       "modelo": "local-deep",
       "criterios_aceptacion": [
-        "cron job ejecuta a las 8am",
-        "resumen llega por Telegram",
-        "incluye tareas pendientes del features.json"
+        "Cron interno de Hermes ejecuta el resumen a las 8am",
+        "El resumen llega por Telegram",
+        "El resumen incluye contexto desde features.json",
+        "La salida final no incluye monólogo interno ni ruido previo"
       ],
-      "contexto_minimo": "Hermes Agent skills + cron, Python 3.11, MLX local"
+      "contexto_minimo": "resumen_diario.py lee history.md y features.json, llama al skill resumen_texto y entrega la salida por el flujo actual de Hermes + Telegram",
+      "notas": [
+        "El flujo ya está operativo en uso real",
+        "Se corrigió el problema histórico de salida con razonamiento/monólogo previo en inglés",
+        "No se contempla integración con WhatsApp en esta fase"
+      ]
     }
   ]
 }

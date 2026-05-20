@@ -15,18 +15,8 @@ optimizado para Apple Silicon con MLX nativo como motor de inferencia local.
 - **Motor local:** MLX · Qwen3-4B/8B/VL (Apple Silicon nativo, sin Ollama)
 - **Motor nube:** OpenRouter (Nemotron 120B free · Gemini Pro · DeepSeek · +600 modelos)
 - **Agente base:** Hermes Agent (Nous Research · MIT) — auto-mejora · memoria · gateway
-- **Gateway activo:** Telegram (acceso desde iPhone/iPad)
+- **Gateway:** Telegram + WhatsApp (acceso desde iPhone/iPad)
 - **Entorno:** macOS · Zsh · dotfiles modulares · Zero-Friction
-
-## Estado actual
-
-- ✅ MLX local operativo en Apple Silicon
-- ✅ Skill `resumen_texto` funcional
-- ✅ Resumen diario operativo con cron interno de Hermes
-- ✅ Entrega del resumen por Telegram
-- ✅ `resumen_diario.py` consume `history.md` y `features.json`
-- ✅ Corrección aplicada para evitar monólogo interno o ruido previo en la salida final
-- ⏳ WhatsApp fuera de alcance en la fase actual
 
 ## Los 3 Pilares
 
@@ -36,50 +26,38 @@ optimizado para Apple Silicon con MLX nativo como motor de inferencia local.
 
 ## Estructura
 
-```text
+\`\`\`
 hermes/
 ├── agents.md          # Protocolo raíz — punto de entrada del harness
 ├── Nexus.md           # Contexto personal universal (agnóstico al agente)
 ├── features.json      # Tablero de tareas con estado y criterios de aceptación
 ├── init.sh            # Validador de entorno (ejecutar antes de operar)
-├── resumen_diario.py  # Generador del resumen diario a partir de history.md + features.json
 ├── agents/            # Orquestador + subagentes especializados
-├── skills/            # Wrappers reutilizables (MLX, resumen, file tools)
+├── skills/            # Wrappers reutilizables (MLX, file tools)
 ├── scripts/           # mlx-update y utilidades de mantenimiento
-├── resumenes/         # Salidas persistidas de los resúmenes diarios
 └── progress/          # Resultados de subagentes (ignorado por git)
-```
+\`\`\`
 
 ## Requisitos
 
 - macOS 26+ · Apple Silicon (M1/M2/M3/M4)
 - Python 3.11 (Homebrew)
 - mlx-lm instalado: `pip install mlx-lm`
-- Hermes Agent instalado
-- OpenRouter API key: [https://openrouter.ai/keys](https://openrouter.ai/keys)
+- Hermes Agent: `curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash`
+- OpenRouter API key: https://openrouter.ai/keys
 
 ## Inicio rápido
 
-```bash
+\`\`\`bash
 # 1. Validar entorno
-bash ~/Documents/dotfiles/hermes/init.sh
+bash hermes/init.sh
 
 # 2. Iniciar servidor MLX local
 hermes-mlx-start
 
 # 3. Lanzar Hermes Agent
 hermes
-```
-
-## Resumen diario
-
-El flujo actual del resumen diario funciona así:
-
-1. Hermes ejecuta el cron interno programado a las 8:00 AM.
-2. El flujo invoca `~/Documents/dotfiles/hermes/resumen_diario.py`.
-3. El script lee `history.md` y `features.json`.
-4. El contenido se procesa con el skill `resumen_texto`.
-5. La salida final se guarda en `hermes/resumenes/` y se entrega por Telegram.
+\`\`\`
 
 ## Filosofía
 
@@ -87,9 +65,8 @@ El flujo actual del resumen diario funciona así:
 - 🧩 **Modular:** cada agente es un archivo Python independiente.
 - 📖 **Documentado en español** para la comunidad hispanohablante.
 - 🔄 **Sin lock-in:** cambia de modelo sin tocar el harness.
-- 📲 **Acceso móvil sin fricción:** Telegram como canal operativo principal.
 
 ## Autor
 
-René Bedolla · [@Rene-Bedolla](https://github.com/Rene-Bedolla)  
+René Bedolla · [@Rene-Bedolla](https://github.com/Rene-Bedolla)
 Licencia MIT
