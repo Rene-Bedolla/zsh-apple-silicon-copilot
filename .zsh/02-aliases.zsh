@@ -85,8 +85,9 @@ alias hermes-dashboard-off='() {
   local PIDS
   PIDS=$(lsof -ti tcp:8421 2>/dev/null)
   if [[ -n "$PIDS" ]]; then
-    kill -9 $PIDS 2>/dev/null
-    sleep 1
+    # Matar cada PID en loop — lsof puede devolver varios en líneas separadas
+    echo "$PIDS" | xargs -r kill -9 2>/dev/null
+    sleep 2  # dar tiempo al kernel para liberar el socket
   fi
   if lsof -ti tcp:8421 >/dev/null 2>&1; then
     echo "❌ No se pudo liberar :8421"

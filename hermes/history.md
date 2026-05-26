@@ -49,3 +49,31 @@ publico: true
 - entrega: Telegram
 - scheduler: cron interno de Hermes
 - nota: se cierra la tarea por cumplimiento operativo, aunque el dashboard quede con arranque manual mediante `hermes-dashboard-on`
+
+## 2026-05-22 13:00:14 — init.sh
+
+- resultado: 10 OK, 0 WARN, 1 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1779476411}, {"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1779476411}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1779476411}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-05-22 13:28:09 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1779478089}, {"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1779478089}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1779478089}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-05-22 13:43:14 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1779478994}, {"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1779478994}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1779478994}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-05-22 15:14:00 — dashboard-off fix
+
+- bug: hermes-dashboard-off no liberaba :8421 correctamente
+- fix: matar el proceso con mejor manejo de PID y liberación del socket
+- estado: resuelto
+- impacto: dashboard manual y launchd ya no entran en conflicto
