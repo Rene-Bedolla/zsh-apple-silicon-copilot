@@ -4,29 +4,24 @@
 # PROPÓSITO: Switch zero-fricción entre modelo local MLX y nube (OpenRouter)
 # INTEGRA CON: hermes_router.zsh (_hermes_mlx_activo), mlx-server-start.sh
 # CONVENCIÓN: extiende la familia hermes-* de 02-aliases.zsh
+# PERFIL LOCAL POR DEFECTO: Qwen3-4B-4bit (rápido, menor RAM)
 # ==============================================================================
 
 _HERMES_CONFIG="$HOME/.hermes/config.yaml"
 _MLX_START="$HOME/Documents/dotfiles/hermes/scripts/mlx-server-start.sh"
+_HERMES_LOCAL_MODEL="mlx-community/Qwen3-4B-4bit"
 
-# ------------------------------------------------------------------------------
-# hermes-local — activa Qwen3-8B local como provider de Hermes CLI
-# Levanta mlx_lm.server si no está corriendo (reutiliza mlx-server-start.sh)
-# ------------------------------------------------------------------------------
 function hermes-local() {
-    echo "⚙  Configurando HERMES → LOCAL (Qwen3-8B-4bit)"
+    echo "⚙  Configurando HERMES → LOCAL (Qwen3-4B-4bit)"
 
-    # 1. Levantar servidor MLX si no responde
     if ! _hermes_mlx_activo; then
         echo "   Servidor MLX inactivo — arrancando en :8000..."
-        export MLX_ACTIVE_MODEL="mlx-community/Qwen3-8B-4bit"
-        # mlx-server-start.sh lee MLX_ACTIVE_MODEL y hace exec (no regresa)
-        # lo lanzamos en background para no bloquear el shell
+        export MLX_ACTIVE_MODEL="$_HERMES_LOCAL_MODEL"
         bash "$_MLX_START" &
         local _wait=0
-        # Esperar máximo 12s a que el puerto responda
         while ! _hermes_mlx_activo && (( _wait < 12 )); do
-            sleep 2; (( _wait += 2 ))
+            sleep 2
+            (( _wait += 2 ))
             echo "   ...esperando servidor MLX (${_wait}s)"
         done
         if ! _hermes_mlx_activo; then
@@ -37,21 +32,16 @@ function hermes-local() {
         echo "   Servidor MLX ya activo en :8000 ✅"
     fi
 
-    # 2. Apuntar Hermes CLI al endpoint local (OpenAI-compatible)
-    hermes config set model.default   "mlx-community/Qwen3-8B-4bit"
+    hermes config set model.default   "$_HERMES_LOCAL_MODEL"
     hermes config set model.provider  "custom"
     hermes config set model.base_url  "http://localhost:8000/v1"
     hermes config set model.api_key   "local-mlx"
     hermes config set model.api_mode  "chat_completions"
 
-    echo "🤖  HERMES → LOCAL  │ Qwen3-8B-4bit @ :8000"
+    echo "🤖  HERMES → LOCAL  │ Qwen3-4B-4bit @ :8000"
     echo "    Usa 'hermes chat' para abrir sesión."
 }
 
-# ------------------------------------------------------------------------------
-# hermes-cloud — restaura Nemotron free via OpenRouter
-# No apaga el servidor MLX (puede seguir siendo usado por hermes-ask)
-# ------------------------------------------------------------------------------
 function hermes-cloud() {
     echo "☁️  Configurando HERMES → CLOUD (Nemotron-3 Super 120B free)"
 
@@ -65,11 +55,6 @@ function hermes-cloud() {
     echo "    Usa 'hermes chat' para abrir sesión."
 }
 
-# ------------------------------------------------------------------------------
-# hermes-mlx-stop — apaga el servidor MLX y libera RAM (~5-6 GB)
-# Separado de hermes-cloud para no obligar a apagar MLX al cambiar a nube
-# (hermes-ask rapido/codigo sigue funcionando si MLX está activo)
-# ------------------------------------------------------------------------------
 function hermes-mlx-stop() {
     local pid
     pid=$(lsof -i :8000 -sTCP:LISTEN -t 2>/dev/null)
@@ -80,29 +65,23 @@ function hermes-mlx-stop() {
     fi
 }
 
-# ------------------------------------------------------------------------------
-# hermes-model-status — muestra provider/modelo activo en Hermes config
-# Complementa hermes-router-status de hermes_router.zsh
-# ------------------------------------------------------------------------------
 function hermes-model-status() {
     echo ""
     echo "  ╔══════════════════════════════════════════════════════╗"
     echo "  ║   🤖  HERMES Model — Configuración activa           ║"
     echo "  ╚══════════════════════════════════════════════════════╝"
-    # Extraer provider y modelo del config sin abrir el wizard
+
     local _model _provider _base
-    _model=$(grep -A1 'model:' "$_HERMES_CONFIG" 2>/dev/null \
-             | grep 'default:' | awk '{print $2}')
-    _provider=$(grep 'provider:' "$_HERMES_CONFIG" 2>/dev/null \
-                | head -1 | awk '{print $2}')
-    _base=$(grep 'base_url:' "$_HERMES_CONFIG" 2>/dev/null \
-            | head -1 | awk '{print $2}')
+    _model=$(grep -A1 '^model:' "$_HERMES_CONFIG" 2>/dev/null | grep 'default:' | awk '{print $2}')
+    _provider=$(grep -A4 '^model:' "$_HERMES_CONFIG" 2>/dev/null | grep 'provider:' | head -1 | awk '{print $2}')
+    _base=$(grep -A6 '^model:' "$_HERMES_CONFIG" 2>/dev/null | grep 'base_url:' | head -1 | awk '{print $2}')
+
     echo ""
     echo "  Modelo   : ${_model:-desconocido}"
     echo "  Provider : ${_provider:-desconocido}"
     echo "  Base URL : ${_base:-desconocido}"
     echo ""
-    # Estado del servidor MLX
+
     if _hermes_mlx_activo; then
         echo "  🟢 Servidor MLX activo en :8000"
     else

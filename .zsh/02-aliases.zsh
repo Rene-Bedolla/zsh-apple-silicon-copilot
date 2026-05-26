@@ -103,3 +103,10 @@ alias hermes-dashboard-log='tail -40 /tmp/hermes-dashboard.log'
 alias hermes-gateway-on='hermes gateway start'
 alias hermes-gateway-off='hermes gateway stop'
 alias hermes-gateway-status='hermes gateway status'
+
+# ── HERMES — Switch de modelo ─────────────────────────────────────────────────
+# Funciones definidas en: ~/.zsh/funciones/hermes_model.zsh
+# hermes-local       → Qwen3-8B-4bit local via MLX
+# hermes-cloud       → Nemotron free via OpenRouter
+# hermes-mlx-stop    → apaga el servidor MLX en :8000
+# hermes-model-status→ muestra provider/modelo activo

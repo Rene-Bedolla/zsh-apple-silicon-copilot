@@ -2,7 +2,7 @@
 # ==============================================================================
 # ARCHIVO: 01-exports.zsh
 # PROPÓSITO: Definición de variables de entorno y PATH de macOS
-# ÚLTIMA REVISIÓN: 2026-05-04
+# ÚLTIMA REVISIÓN: 2026-05-25
 # ==============================================================================
 
 # ── 1. Idioma y Localización ───────────────────────────────────────────────────
@@ -23,15 +23,12 @@ fi
 export PATH="$HOME/Documents/dotfiles/scripts:$PATH"
 
 # ── 5. Node Version Manager (nvm) ─────────────────────────────────────────────
-# Gestión de versiones de Node.js — instalado via Homebrew
-# Node activo: v24.15.0 LTS (requerido por coc.nvim y herramientas modernas)
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && source "/opt/homebrew/opt/nvm/nvm.sh"
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \
   source "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
 
 # ── 6. LM Studio CLI ──────────────────────────────────────────────────────────
-# CLI de LM Studio — presente en PATH aunque no esté activo actualmente
 export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # ── 7. Utilidades Locales ─────────────────────────────────────────────────────
@@ -46,5 +43,5 @@ typeset -U PATH
 
 # ── 10. HERMES — Modelo MLX activo ────────────────────────────────────────────
 # Consumida por mlx-server-start.sh y hermes_model.zsh
-# Cambiar con: hermes-local (8B) | hermes-cloud (Nemotron)
-export MLX_ACTIVE_MODEL="mlx-community/Qwen3-8B-4bit"
+# Perfil rápido por defecto: Qwen3-4B-4bit
+export MLX_ACTIVE_MODEL="mlx-community/Qwen3-4B-4bit"
