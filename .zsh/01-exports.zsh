@@ -43,3 +43,8 @@ export SDKMAN_DIR="$HOME/.sdkman"
 
 # ── 9. Mantener PATH limpio de duplicados ─────────────────────────────────────
 typeset -U PATH
+
+# ── 10. HERMES — Modelo MLX activo ────────────────────────────────────────────
+# Consumida por mlx-server-start.sh y hermes_model.zsh
+# Cambiar con: hermes-local (8B) | hermes-cloud (Nemotron)
+export MLX_ACTIVE_MODEL="mlx-community/Qwen3-8B-4bit"
