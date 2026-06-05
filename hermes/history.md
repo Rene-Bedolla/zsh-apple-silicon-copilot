@@ -77,3 +77,87 @@ publico: true
 - fix: matar el proceso con mejor manejo de PID y liberación del socket
 - estado: resuelto
 - impacto: dashboard manual y launchd ya no entran en conflicto
+
+## 2026-05-26 12:25:48 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-05-27 08:00:26 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-05-28 08:00:07 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-05-29 08:00:17 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-05-30 08:00:37 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-05-31 08:00:35 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-01 08:00:50 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-02 08:00:35 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-03 08:00:37 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-04 08:00:19 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-05 08:00:15 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-05 12:21:49 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1780683709}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1780683709}, {"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1780683709}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
