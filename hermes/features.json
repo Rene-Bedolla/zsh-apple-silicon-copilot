@@ -1,27 +1,73 @@
 {
-  "version": "1.0",
+  "version": "2.1",
   "proyecto": "HERMES Personal Harness",
-  "descripcion": "Tablero de tareas para el orquestador multiagente",
-  "tareas": [
+  "actualizado": "2026-06-05",
+
+  "gobernanza": {
+    "proposito_archivo": "Manifiesto estructurado del harness personal de Hermes en dotfiles.",
+    "fuente_de_verdad": {
+      "identidad_global": "~/.hermes/SOUL.md",
+      "manual_operativo_repo": "~/Documents/dotfiles/hermes/AGENTS.md",
+      "skills_reales": "~/.hermes/skills/",
+      "estado_runtime": "~/.hermes/status.json"
+    },
+    "no_controla": [
+      "configuracion interna del core oficial de Hermes Agent",
+      "carga real de skills del sistema",
+      "perfiles nativos del runtime",
+      "sesiones, memoria o gateway a nivel core"
+    ]
+  },
+
+  "sistema": {
+    "hermes_dir": "~/Documents/dotfiles/hermes",
+    "mlx_endpoint": "http://localhost:8000/v1",
+    "gateway_principal": "telegram",
+    "init_script": "~/Documents/dotfiles/hermes/init.sh",
+    "status_file": "~/.hermes/status.json"
+  },
+
+  "aliases_modelo": {
+    "local_fast": "mlx-community/Qwen3-4B-4bit",
+    "local_deep": "mlx-community/Qwen3-8B-4bit",
+    "remoto_razonamiento": "openrouter/nvidia/llama-3.1-nemotron-ultra-253b-v1:free"
+  },
+
+  "harness": {
+    "skills_harness": [
+      "skill_resumen",
+      "skill_buscar_cerebro",
+      "skill_traducir"
+    ],
+    "comandos_telegram": [
+      "resumen_hoy",
+      "buscar_cerebro"
+    ],
+    "integraciones": {
+      "cerebro_obsidian": true,
+      "chromadb_index": true,
+      "telegram_gateway": true
+    }
+  },
+
+  "backlog": [
     {
       "id": "H-002",
       "titulo": "Resumen diario por Telegram",
-      "estado": "cerrado",
+      "descripcion": "Cron interno de Hermes ejecuta resumen_diario.py a las 8am y entrega el resultado por Telegram sin monólogo interno ni ruido previo.",
+      "estado": "done",
       "prioridad": "baja",
-      "agente": "implementer",
-      "modelo": "local-deep",
-      "criterios_aceptacion": [
-        "Cron interno de Hermes ejecuta el resumen a las 8am",
-        "El resumen llega por Telegram",
-        "El resumen incluye contexto desde features.json",
-        "La salida final no incluye monólogo interno ni ruido previo"
-      ],
-      "contexto_minimo": "resumen_diario.py lee history.md y features.json, llama al skill resumen_texto y entrega la salida por el flujo actual de Hermes + Telegram",
-      "notas": [
-        "El flujo ya está operativo en uso real",
-        "Se corrigió el problema histórico de salida con razonamiento/monólogo previo en inglés",
-        "No se contempla integración con WhatsApp en esta fase"
-      ]
+      "etiquetas": ["automatizacion", "telegram", "cron", "resumen"],
+      "notas": "Flujo operativo desde 2026-05-19. Problema de salida en inglés corregido."
+    },
+    {
+      "id": "H-003",
+      "titulo": "Modularizar AGENTS.md y features.json",
+      "descripcion": "Separar responsabilidades: features.json como manifiesto estructurado del harness y AGENTS.md como contrato operativo del proyecto.",
+      "estado": "review",
+      "prioridad": "alta",
+      "etiquetas": ["harness", "arquitectura", "refactor"],
+      "notas": "Refactor estructural ejecutado el 2026-06-05; pendiente cierre formal."
     }
   ]
 }

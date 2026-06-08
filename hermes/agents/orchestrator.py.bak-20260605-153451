@@ -22,18 +22,12 @@ import argparse
 import asyncio
 import json
 import re
-import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
 import httpx
-
-# Permite importar el paquete local 'hermes' desde ~/Documents/dotfiles
-DOTFILES_ROOT = Path.home() / "Documents" / "dotfiles"
-if str(DOTFILES_ROOT) not in sys.path:
-    sys.path.insert(0, str(DOTFILES_ROOT))
 
 from hermes.skills import load_skills  # skills: resumen_texto, buscar_cerebro, etc.
 

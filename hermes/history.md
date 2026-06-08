@@ -161,3 +161,45 @@ publico: true
 - mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1780683709}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1780683709}, {"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1780683709}]}]
 - hermes_agent: installed=true
 - telegram_gateway: up=true
+
+## 2026-06-05 15:43:00 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[{"object": "list", "data": [{"id": "mlx-community/Qwen3-8B-4bit", "object": "model", "created": 1780695779}, {"id": "mlx-community/Qwen3-4B-4bit", "object": "model", "created": 1780695779}, {"id": "mlx-community/Qwen3-VL-4B-Instruct-4bit", "object": "model", "created": 1780695779}]}]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-05 16:04:39 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-8B-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-VL-4B-Instruct-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-05 16:08:25 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-8B-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-VL-4B-Instruct-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-05 16:09:28 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-8B-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-VL-4B-Instruct-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-06 08:00:37 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-07 08:00:16 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente

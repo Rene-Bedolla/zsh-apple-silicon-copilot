@@ -18,7 +18,7 @@ check_fail() { echo -e "  ${RED}❌${NC} $1"; ((FAIL++)); }
 check_warn() { echo -e "  ${YELLOW}⚠️${NC}  $1"; ((WARN++)); }
 
 MLX_UP="false"
-MLX_MODELS_JSON="[]"
+MLX_MODELS=""
 HERMES_INSTALLED="false"
 TG_UP="false"
 
@@ -43,15 +43,15 @@ fi
 if curl -s --max-time 3 http://localhost:8000/v1/models >/dev/null 2>&1; then
     check_ok "Servidor MLX activo en :8000"
     MLX_UP="true"
-    MLX_MODELS_JSON=$(curl -s --max-time 3 http://localhost:8000/v1/models | \
-      /opt/homebrew/opt/python@3.11/libexec/bin/python3 -c '
+    MLX_MODELS=$(curl -s --max-time 3 http://localhost:8000/v1/models | \
+        /opt/homebrew/opt/python@3.11/libexec/bin/python3 -c '
 import sys, json
 try:
     data = json.load(sys.stdin)
     ids = [m.get("id", "") for m in data.get("data", []) if m.get("id")]
-    print(json.dumps(ids, ensure_ascii=False))
+    print(",".join(ids))
 except Exception:
-    print("[]")
+    print("")
 ')
 else
     check_warn "Servidor MLX inactivo — ejecuta: mlx-on"
@@ -80,15 +80,7 @@ else
     TG_UP="false"
 fi
 
-if [[ -f "$HERMES_DIR/AGENTS.md" ]]; then
-    check_ok "AGENTS.md presente"
-elif [[ -f "$HERMES_DIR/agents.md" ]]; then
-    check_warn "agents.md presente (legado); conviene migrar a AGENTS.md"
-else
-    check_warn "AGENTS.md no encontrado en hermes/"
-fi
-
-for archivo in Nexus.md features.json; do
+for archivo in agents.md Nexus.md features.json; do
     if [[ -f "$HERMES_DIR/$archivo" ]]; then
         check_ok "$archivo presente"
     else
@@ -126,7 +118,7 @@ cat > "$STATUS_FILE" << JSONEOF
   "mlx": {
     "up": ${MLX_UP},
     "endpoint": "http://localhost:8000/v1",
-    "models": ${MLX_MODELS_JSON}
+    "models": "${MLX_MODELS}"
   },
   "hermes_agent": {
     "installed": ${HERMES_INSTALLED}
@@ -155,21 +147,12 @@ publico: true
 HEOF
 fi
 
-MLX_MODELS_TXT=$(printf '%s' "$MLX_MODELS_JSON" | /opt/homebrew/opt/python@3.11/libexec/bin/python3 -c '
-import sys, json
-try:
-    data = json.load(sys.stdin)
-    print(", ".join(data))
-except Exception:
-    print("")
-')
-
 {
   echo ""
   echo "## $(date '+%Y-%m-%d %H:%M:%S') — init.sh"
   echo ""
   echo "- resultado: ${PASS} OK, ${WARN} WARN, ${FAIL} FAIL"
-  echo "- mlx: up=${MLX_UP}, modelos=[${MLX_MODELS_TXT}]"
+  echo "- mlx: up=${MLX_UP}, modelos=[${MLX_MODELS}]"
   echo "- hermes_agent: installed=${HERMES_INSTALLED}"
   echo "- telegram_gateway: up=${TG_UP}"
 } >> "$HISTORY_FILE"

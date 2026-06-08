@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "proyecto": "HERMES Personal Harness",
+  "descripcion": "Tablero de tareas para el orquestador multiagente",
+  "tareas": [
+    {
+      "id": "H-002",
+      "titulo": "Resumen diario por Telegram",
+      "estado": "cerrado",
+      "prioridad": "baja",
+      "agente": "implementer",
+      "modelo": "local-deep",
+      "criterios_aceptacion": [
+        "Cron interno de Hermes ejecuta el resumen a las 8am",
+        "El resumen llega por Telegram",
+        "El resumen incluye contexto desde features.json",
+        "La salida final no incluye monólogo interno ni ruido previo"
+      ],
+      "contexto_minimo": "resumen_diario.py lee history.md y features.json, llama al skill resumen_texto y entrega la salida por el flujo actual de Hermes + Telegram",
+      "notas": [
+        "El flujo ya está operativo en uso real",
+        "Se corrigió el problema histórico de salida con razonamiento/monólogo previo en inglés",
+        "No se contempla integración con WhatsApp en esta fase"
+      ]
+    }
+  ]
+}

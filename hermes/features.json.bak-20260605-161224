@@ -1,0 +1,57 @@
+{
+  "version": "2.0",
+  "proyecto": "HERMES Personal Harness",
+  "actualizado": "2026-06-05",
+
+  "sistema": {
+    "hermes_dir": "~/Documents/dotfiles/hermes",
+    "mlx_endpoint": "http://localhost:8000/v1",
+    "gateway": "telegram",
+    "init_script": "~/Documents/dotfiles/hermes/init.sh",
+    "status_file": "~/.hermes/status.json"
+  },
+
+  "modelos": {
+    "local-fast": "mlx-community/Qwen3-4B-4bit",
+    "local-deep": "mlx-community/Qwen3-8B-4bit",
+    "remoto-razonamiento": "openrouter/nvidia/llama-3.1-nemotron-ultra-253b-v1:free"
+  },
+
+  "capacidades": {
+    "skills_activas": [
+      "skill_resumen",
+      "skill_buscar_cerebro",
+      "skill_traducir"
+    ],
+    "comandos_telegram": [
+      "resumen_hoy",
+      "buscar_cerebro"
+    ],
+    "integraciones": {
+      "cerebro_obsidian": true,
+      "chromadb_index": true,
+      "telegram_gateway": true
+    }
+  },
+
+  "tareas": [
+    {
+      "id": "H-002",
+      "titulo": "Resumen diario por Telegram",
+      "descripcion": "Cron interno de Hermes ejecuta resumen_diario.py a las 8am y entrega el resultado por Telegram sin monólogo interno ni ruido previo.",
+      "estado": "done",
+      "prioridad": "baja",
+      "etiquetas": ["automatizacion", "telegram", "cron", "resumen"],
+      "notas": "Flujo operativo desde 2026-05-19. Problema de salida en inglés corregido."
+    },
+    {
+      "id": "H-003",
+      "titulo": "Modularizar agents.md y features.json",
+      "descripcion": "Separar responsabilidades: features.json como registro de capacidades del sistema, agents.md como contrato de agentes y protocolo de harness.",
+      "estado": "doing",
+      "prioridad": "alta",
+      "etiquetas": ["harness", "arquitectura", "refactor"],
+      "notas": "Iniciado 2026-06-05."
+    }
+  ]
+}
