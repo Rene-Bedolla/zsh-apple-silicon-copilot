@@ -2,7 +2,7 @@
 # ==============================================================================
 # ARCHIVO: 01-exports.zsh
 # PROPÓSITO: Definición de variables de entorno y PATH de macOS
-# ÚLTIMA REVISIÓN: 2026-05-25
+# ÚLTIMA REVISIÓN: 2026-06-09
 # ==============================================================================
 
 # ── 1. Idioma y Localización ───────────────────────────────────────────────────
@@ -17,6 +17,12 @@ if [[ -d "/opt/homebrew/opt/python@3.11/libexec/bin" ]]; then
   export PATH="/opt/homebrew/opt/python@3.11/libexec/bin:$PATH"
 elif [[ -d "/opt/homebrew/opt/python@3.11/bin" ]]; then
   export PATH="/opt/homebrew/opt/python@3.11/bin:$PATH"
+fi
+
+# ── 3.1 FFmpeg Full (subtitles/libass) ────────────────────────────────────────
+# Keg-only: se prioriza explícitamente para asegurar el filtro subtitles.
+if [[ -d "/opt/homebrew/opt/ffmpeg-full/bin" ]]; then
+  export PATH="/opt/homebrew/opt/ffmpeg-full/bin:$PATH"
 fi
 
 # ── 4. Scripts Públicos (Dotfiles) ────────────────────────────────────────────
