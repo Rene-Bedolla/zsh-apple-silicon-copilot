@@ -203,3 +203,10 @@ publico: true
 - canal: telegram
 - origen: cron
 - nota: resumen diario generado y entregado correctamente
+
+## 2026-06-11 08:00:46 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
