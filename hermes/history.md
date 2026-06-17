@@ -210,3 +210,38 @@ publico: true
 - canal: telegram
 - origen: cron
 - nota: resumen diario generado y entregado correctamente
+
+## 2026-06-13 08:00:47 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-14 08:00:36 — resumen-diario
+
+- resultado: ok
+- canal: telegram
+- origen: cron
+- nota: resumen diario generado y entregado correctamente
+
+## 2026-06-16 12:06:32 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-8B-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-VL-4B-Instruct-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-16 16:22:38 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-VL-4B-Instruct-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-8B-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true
+
+## 2026-06-17 11:28:36 — init.sh
+
+- resultado: 11 OK, 0 WARN, 0 FAIL
+- mlx: up=true, modelos=[mlx-community/Qwen3-8B-4bit, mlx-community/Qwen3-4B-4bit, mlx-community/Qwen3-VL-4B-Instruct-4bit]
+- hermes_agent: installed=true
+- telegram_gateway: up=true

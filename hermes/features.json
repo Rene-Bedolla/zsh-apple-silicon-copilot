@@ -37,7 +37,8 @@
     "skills_harness": [
       "skill_resumen",
       "skill_buscar_cerebro",
-      "skill_traducir"
+      "skill_traducir",
+      "skill_procesar_inbox_obsidian"
     ],
     "comandos_telegram": [
       "resumen_hoy",
@@ -68,6 +69,15 @@
       "prioridad": "alta",
       "etiquetas": ["harness", "arquitectura", "refactor"],
       "notas": "Refactor estructural ejecutado el 2026-06-05; pendiente cierre formal."
+    },
+    {
+      "id": "H-004",
+      "titulo": "Revisión de Inbox Obsidian",
+      "descripcion": "Skill procesar_inbox_obsidian lista notas pendientes en ~/Notas/Notas con estado=pendiente y tag inbox; integra vista de Inbox en el harness.",
+      "estado": "in-progress",
+      "prioridad": "media",
+      "etiquetas": ["obsidian", "inbox", "cerebro"],
+      "notas": "Versión 1 solo lectura; no mueve archivos ni cambia frontmatter."
     }
   ]
 }

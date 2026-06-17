@@ -2,9 +2,7 @@
 # ==============================================================================
 # ARCHIVO: hermes_model.zsh
 # PROPÓSITO: Switch zero-fricción entre modelo local MLX y nube (OpenRouter)
-# INTEGRA CON: hermes_router.zsh (_hermes_mlx_activo), mlx-server-start.sh
-# CONVENCIÓN: extiende la familia hermes-* de 02-aliases.zsh
-# PERFIL LOCAL POR DEFECTO: Qwen3-4B-4bit (rápido, menor RAM)
+# PERFIL LOCAL POR DEFECTO: Qwen3-4B-4bit (rápido, menos RAM)
 # ==============================================================================
 
 _HERMES_CONFIG="$HOME/.hermes/config.yaml"
@@ -12,7 +10,7 @@ _MLX_START="$HOME/Documents/dotfiles/hermes/scripts/mlx-server-start.sh"
 _HERMES_LOCAL_MODEL="mlx-community/Qwen3-4B-4bit"
 
 function hermes-local() {
-    echo "⚙  Configurando HERMES → LOCAL (Qwen3-4B-4bit)"
+    echo "⚙  Configurando HERMES → LOCAL (${_HERMES_LOCAL_MODEL})"
 
     if ! _hermes_mlx_activo; then
         echo "   Servidor MLX inactivo — arrancando en :8000..."
@@ -38,7 +36,7 @@ function hermes-local() {
     hermes config set model.api_key   "local-mlx"
     hermes config set model.api_mode  "chat_completions"
 
-    echo "🤖  HERMES → LOCAL  │ Qwen3-4B-4bit @ :8000"
+    echo "🤖  HERMES → LOCAL  │ ${_HERMES_LOCAL_MODEL} @ :8000"
     echo "    Usa 'hermes chat' para abrir sesión."
 }
 

@@ -58,3 +58,6 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # 7. Tema Powerlevel10k (Debe ir al final absoluto)
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Hermes Agent — ensure ~/.local/bin is on PATH
+export PATH="$HOME/.local/bin:$PATH"

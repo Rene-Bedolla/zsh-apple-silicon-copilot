@@ -110,3 +110,59 @@ alias hermes-gateway-status='hermes gateway status'
 # hermes-cloud       → Nemotron free via OpenRouter
 # hermes-mlx-stop    → apaga el servidor MLX en :8000
 # hermes-model-status→ muestra provider/modelo activo
+
+# ── HERMES — Inbox Obsidian (~/Notas/Notas) ───────────────────────────────────
+# Muestra las notas pendientes del Inbox (estado: pendiente, tag: inbox)
+# usando el skill procesar_inbox_obsidian de tu harness local.
+#
+# Uso:
+#   hermes-inbox         # lista 10 notas pendientes como máximo
+#   hermes-inbox 5       # lista 5 notas pendientes
+#   hermes-inbox 20      # lista 20 notas (si existen)
+#
+# La salida es Markdown, apta para copiar a Obsidian o para pipear a glow/bat.
+
+hermes-inbox() {
+  local max="${1:-10}"
+
+  # Asegurar que el argumento es un número entero positivo
+  if [[ ! "$max" =~ '^[0-9]+$' ]]; then
+    echo "Uso: hermes-inbox [N]" >&2
+    echo "  N = número máximo de notas a listar (por defecto 10)" >&2
+    return 1
+  fi
+
+  # Ejecutar el skill desde la raíz del repo hermes
+  (
+    cd ~/Documents/dotfiles || exit 1
+    PYTHONPATH=. python3 -m hermes.skills.run_skill procesar_inbox_obsidian <<< "$max"
+  )
+}
+
+# ── HERMES — Inbox Obsidian con glow ──────────────────────────────────────────
+# Muestra las notas pendientes del Inbox (~//Notas/Notas) usando el skill
+# procesar_inbox_obsidian y las renderiza en Markdown con glow por defecto.
+#
+# Uso:
+#   hermes-inbox         # lista 10 notas
+#   hermes-inbox 5       # lista 5 notas
+#   hermes-inbox 20      # lista 20 notas
+#
+# Si glow no está disponible, hace fallback a cat (alias de bat).
+
+hermes-inbox() {
+  local max="${1:-10}"
+
+  # Validar que N sea entero positivo
+  if [[ ! "$max" =~ '^[0-9]+$' ]]; then
+    echo "Uso: hermes-inbox [N]" >&2
+    echo "  N = número máximo de notas a listar (por defecto 10)" >&2
+    return 1
+  fi
+
+  (
+    cd ~/Documents/dotfiles || exit 1
+    PYTHONPATH=. python3 -m hermes.skills.run_skill procesar_inbox_obsidian <<< "$max" \
+      | if command -v glow >/dev/null 2>&1; then glow -; else cat; fi
+  )
+}
