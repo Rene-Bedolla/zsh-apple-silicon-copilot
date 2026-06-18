@@ -17,7 +17,7 @@ alias respaldo-cold='generar_cold_backup'
 alias macos-tweaks='~/Documents/dotfiles/scripts/macos_tweaks.sh'
 
 # ─── Navegación y CLI Visual (eza + bat) ──────────────────────────────────────
-alias cat='bat --paging=never'
+# alias cat='bat --paging=never'
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first'
 alias la='eza -la --icons --group-directories-first --git'

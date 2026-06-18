@@ -25,115 +25,93 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 function git-ia() {
     if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        printf "❌ Error: No estás dentro de un repositorio de Git.\n"
+        printf "❌ Error: No estás dentro de un repositorio de Git.
+"
         return 1
     fi
 
     local DIFF
     DIFF=$(git diff HEAD)
     if [[ -z "$DIFF" ]]; then
-        printf "📭 No hay cambios detectados. Haz 'git add' primero.\n"
+        printf "📭 No hay cambios detectados. Haz 'git add' primero.
+"
         return 1
     fi
 
-    printf "⚡ Analizando código con MLX y generando mensajes...\n"
+    printf "⚡ Analizando código con MLX y generando mensajes...
+"
 
     local TMP_DIFF TMP_SCRIPT
     TMP_DIFF=$(mktemp /tmp/mlx_diff_XXXXXX.txt)
     TMP_SCRIPT=$(mktemp /tmp/mlx_git_XXXXXX.py)
 
-    printf '%s' "$DIFF" | head -c 3000 > "$TMP_DIFF"
+    printf '%s' "$DIFF" | head -c 3500 > "$TMP_DIFF"
 
-    # << 'PYEOF': sin expansión shell → \n llega literal al .py
-    # r'\n' en raw string Python = regex newline real ✓ (NO r'\\n')
     cat > "$TMP_SCRIPT" << 'PYEOF'
-import sys, io, re, json, contextlib
+import sys, io, re, contextlib
 from mlx_lm import load, generate
 from mlx_lm.sample_utils import make_sampler
 
 model_name = sys.argv[1]
-diff_path  = sys.argv[2]
+diff_path = sys.argv[2]
 
-with open(diff_path, 'r', errors='replace') as f:
+with open(diff_path, "r", errors="replace") as f:
     diff_text = f.read()
 
 prompt_text = (
-    "Eres un desarrollador senior. Analiza este git diff y genera 3 opciones "
-    "de mensajes de commit (feat, fix, chore, etc). "
-    'RESPONDE ÚNICAMENTE CON UN JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA: '
-    '{"commits": ["mensaje 1", "mensaje 2", "mensaje 3"]}. DIFF:\n' + diff_text
+    "Analiza este git diff y escribe exactamente 3 mensajes de commit en español, "
+    "usando Conventional Commits. Reglas: una línea por commit, sin numeración, "
+    "sin viñetas, sin comillas, sin explicación, sin títulos como Draft o Refinement. "
+    "Cada línea debe empezar con feat:, fix:, chore:, docs:, refactor:, perf:, test:, build: o ci:. "
+    "Cada línea debe describir un cambio real del diff.\n\n"
+    + diff_text
+    + "\n\n/no_think"
 )
 
-try:
-    model, tokenizer = load(model_name)
-    messages = [{"role": "user", "content": prompt_text}]
-    formatted_prompt = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+model, tokenizer = load(model_name)
+messages = [{"role": "user", "content": prompt_text}]
+formatted_prompt = tokenizer.apply_chat_template(
+    messages, tokenize=False, add_generation_prompt=True
+)
+
+sampler = make_sampler(temp=0.2)
+buffer = io.StringIO()
+
+with contextlib.redirect_stdout(buffer):
+    generate(
+        model,
+        tokenizer,
+        prompt=formatted_prompt,
+        max_tokens=220,
+        sampler=sampler,
+        verbose=True,
     )
 
-    sampler = make_sampler(temp=0.1)
-    buffer  = io.StringIO()
+raw = buffer.getvalue()
+stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
+m = stats_pat.search(raw)
+text = raw[:m.start()].strip() if m else raw.strip()
 
-    with contextlib.redirect_stdout(buffer):
-        generate(model, tokenizer, prompt=formatted_prompt,
-                 max_tokens=800, sampler=sampler, verbose=True)
+if "</think>" in text:
+    text = text.split("</think>")[-1].strip()
+else:
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
 
-    raw = buffer.getvalue()
+valid = []
+for line in text.splitlines():
+    clean = line.strip().strip('"').strip("'").strip()
+    clean = re.sub(r"^[\-*\d\.\)\s]+", "", clean).strip()
+    if not clean:
+        continue
+    if clean.lower().startswith(("feat:", "fix:", "chore:", "docs:", "refactor:", "perf:", "test:", "build:", "ci:")):
+        if clean not in valid:
+            valid.append(clean)
 
-    # FIX: r'\n' → regex newline real (era r'\\n' → matcheaba literal \n)
-    stats_pat = re.compile(r'\n={5,}\s*\nPrompt:', re.DOTALL)
-    m    = stats_pat.search(raw)
-    text = raw[:m.start()].strip() if m else raw.strip()
+if not valid:
+    valid = ["chore: actualizar archivos del proyecto"]
 
-    if "</think>" in text:
-        text = text.split("</think>")[-1].strip()
-    else:
-        text = text.replace("<think>", "").strip()
-
-    def find_first_json(s):
-        decoder = json.JSONDecoder()
-        for start_char in ('{', '['):
-            idx = s.find(start_char)
-            while idx != -1:
-                try:
-                    obj, _ = decoder.raw_decode(s, idx)
-                    return obj
-                except json.JSONDecodeError:
-                    idx = s.find(start_char, idx + 1)
-        return None
-
-    def extract_list(obj):
-        if isinstance(obj, list): return obj
-        if isinstance(obj, dict):
-            for v in obj.values():
-                res = extract_list(v)
-                if res: return res
-        return None
-
-    parsed = find_first_json(text)
-    if parsed:
-        commits = extract_list(parsed)
-        if commits:
-            for i, commit in enumerate(commits[:3], 1):
-                if isinstance(commit, str):
-                    print(f"{i}. {commit.replace('`','').strip()}")
-                elif isinstance(commit, dict):
-                    print(f"{i}. {str(next(iter(commit.values()), '')).replace('`','').strip()}")
-        else:
-            print("1. chore: actualizar archivos")
-    else:
-        # FIX: split('\n') → newline real (era split('\\n') → split en literal \n)
-        lines = [l.strip() for l in text.split('\n')
-                 if any(p in l for p in ('feat:', 'fix:', 'chore:', 'docs:'))]
-        if lines:
-            for i, line in enumerate(lines[:3], 1):
-                print(f"{i}. {line}")
-        else:
-            print("1. chore: actualizar archivos")
-
-except Exception as e:
-    print(f"❌ Error MLX: {e}", file=sys.stderr)
-    sys.exit(1)
+for i, line in enumerate(valid[:3], 1):
+    print(f"{i}. {line}")
 PYEOF
 
     local RESPUESTA exit_code
@@ -142,16 +120,20 @@ PYEOF
     rm -f "$TMP_SCRIPT" "$TMP_DIFF"
 
     if (( exit_code != 0 )) || [[ -z "$RESPUESTA" ]]; then
-        printf "❌ Sin respuesta de MLX. Revisa: cat /tmp/mlx_error.log\n"
+        printf "❌ Sin respuesta de MLX. Revisa: cat /tmp/mlx_error.log
+"
         return 1
     fi
 
-    # FIX: printf en lugar de echo (echo no expande \n en Zsh por defecto)
-    printf "\n💡 SUGERENCIAS DE AUTO-COMMIT:\n"
+    printf "
+💡 SUGERENCIAS DE AUTO-COMMIT:
+"
     if command -v bat &>/dev/null; then
-        printf '%s\n' "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
+        printf '%s
+' "$RESPUESTA" | bat --style=plain --language=markdown --paging=never
     else
-        printf '%s\n' "$RESPUESTA"
+        printf '%s
+' "$RESPUESTA"
     fi
 }
 
