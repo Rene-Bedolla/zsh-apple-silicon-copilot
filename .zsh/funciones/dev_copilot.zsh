@@ -7,7 +7,7 @@
 # ==============================================================================
 
 # ── Modelo activo ─────────────────────────────────────────────────────────────
-export MLX_COPILOT_MODEL="mlx-community/Qwen3-4B-4bit"
+export MLX_COPILOT_MODEL="mlx-community/Qwen3.5-4B-OptiQ-4bit"
 
 # ── Python con mlx-lm instalado ───────────────────────────────────────────────
 # whence -p: Zsh built-in que resuelve ruta física en $PATH, ignorando aliases
@@ -357,7 +357,7 @@ function conversar-mantener() {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # preguntar
-# Descripción: Copiloto libre. Envía cualquier pregunta a Qwen3-4B local
+# Descripción: Copiloto libre. Envía cualquier pregunta a Qwen3.5-4B-OptiQ-4bit local
 #              y retorna respuesta en Markdown formateada con bat.
 # Uso: preguntar "¿Cómo funciona rsync con --checksum?"
 #      preguntar "explícame la diferencia entre TCP y UDP"

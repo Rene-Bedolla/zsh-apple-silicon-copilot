@@ -17,7 +17,7 @@ import httpx
 from .base import Skill
 
 MLX_URL = "http://localhost:8000/v1/chat/completions"
-DEFAULT_MODEL_ID = "mlx-community/Qwen3-8B-4bit"
+DEFAULT_MODEL_ID = "mlx-community/Qwen3.5-4B-OptiQ-4bit"
 
 Idioma = Literal["es", "en"]
 

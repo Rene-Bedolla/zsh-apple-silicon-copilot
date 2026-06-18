@@ -31,8 +31,8 @@ publico: true
 - Motor: `mlx-lm` · Sin Ollama · Sin llama.cpp como runtime primario
 - Servidor REST: `localhost:8000` (OpenAI-compatible)
 - Modelos activos:
-  - `Qwen3-4B-4bit` → rápido, copiloto terminal
-  - `Qwen3-8B-4bit` → análisis complejo
+  - `Qwen3.5-4B-OptiQ-4bit` → rápido, copiloto terminal
+  - `Qwen3.5-4B-OptiQ-4bit` → análisis complejo
   - `Qwen3-VL-4B-Instruct-4bit` → visión multimodal
   - `whisper-small-mlx` → STT local
 

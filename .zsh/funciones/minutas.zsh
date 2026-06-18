@@ -82,7 +82,7 @@ function texto-minuta() {
     echo "📋 Procesando texto...🧠 Analizando con Qwen3-8B..."
     local prompt_completo="/no_think Actúa como un analista experto. Lee la siguiente transcripción y extrae estructurado: 1) Resumen (3 viñetas), 2) Tareas, 3) Puntos críticos. Transcripción: $texto"
 
-    local minuta=$(mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.1 --prompt "$prompt_completo" 2>/dev/null | _limpiar_output_qwen)
+    local minuta=$(mlx_lm.generate --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.1 --prompt "$prompt_completo" 2>/dev/null | _limpiar_output_qwen)
 
     if [ -z "$minuta" ]; then
         echo "❌ Error: Qwen3 no generó respuesta."
@@ -122,7 +122,7 @@ function audio-minuta() {
     echo "🧠 2/3 Analizando con Qwen3-8B..."
 
     local prompt_completo="/no_think Actúa como analista. Extrae: 1) Resumen, 2) Tareas, 3) Puntos críticos. Transcripción: $texto_audio"
-    local minuta=$(mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.1 --prompt "$prompt_completo" 2>/dev/null | _limpiar_output_qwen)
+    local minuta=$(mlx_lm.generate --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.1 --prompt "$prompt_completo" 2>/dev/null | _limpiar_output_qwen)
 
     echo "$minuta" | pbcopy
     echo "📝 3/3 Guardando..."

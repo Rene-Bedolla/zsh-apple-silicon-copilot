@@ -19,7 +19,7 @@ import httpx
 from .base import Skill
 
 MLX_URL = "http://localhost:8000/v1/chat/completions"
-DEFAULT_MODEL_ID = "mlx-community/Qwen3-4B-4bit"
+DEFAULT_MODEL_ID = "mlx-community/Qwen3.5-4B-OptiQ-4bit"
 
 # Elimina bloques <think>...</think> que algunos servidores insertan en el stream
 _RE_THINK = re.compile(r"<think>.*?</think>", re.DOTALL)

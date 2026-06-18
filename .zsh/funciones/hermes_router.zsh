@@ -80,17 +80,17 @@ function hermes-ask() {
     case "$tipo" in
         rapido|privado)
             ! _hermes_mlx_activo && { echo "⚠️  Iniciando MLX..." >&2; mlx-on; }
-            modelo_usado="Qwen3-4B · local"
+            modelo_usado="Qwen3.5-4B-OptiQ-4bit · local"
             respuesta=$(mlx_lm.generate \
-                --model mlx-community/Qwen3-4B-4bit \
+                --model mlx-community/Qwen3.5-4B-OptiQ-4bit \
                 --prompt "$prompt" \
                 --max-tokens 1000 --temp 0.3 2>/dev/null | _limpiar_output_mlx)
             ;;
         codigo)
             ! _hermes_mlx_activo && { echo "⚠️  Iniciando MLX..." >&2; mlx-on; }
-            modelo_usado="Qwen3-8B · local"
+            modelo_usado="Qwen3.5-4B-OptiQ-4bit · local"
             respuesta=$(mlx_lm.generate \
-                --model mlx-community/Qwen3-8B-4bit \
+                --model mlx-community/Qwen3.5-4B-OptiQ-4bit \
                 --prompt "$prompt" \
                 --max-tokens 2000 --temp 0.2 2>/dev/null | _limpiar_output_mlx)
             ;;
@@ -101,9 +101,9 @@ function hermes-ask() {
         auto)
             local longitud=${#prompt}
             if (( longitud < 300 )) && _hermes_mlx_activo; then
-                modelo_usado="Qwen3-4B · local (auto)"
+                modelo_usado="Qwen3.5-4B-OptiQ-4bit · local (auto)"
                 respuesta=$(mlx_lm.generate \
-                    --model mlx-community/Qwen3-4B-4bit \
+                    --model mlx-community/Qwen3.5-4B-OptiQ-4bit \
                     --prompt "$prompt" \
                     --max-tokens 800 --temp 0.3 2>/dev/null | _limpiar_output_mlx)
             else
@@ -133,8 +133,8 @@ function hermes-router-status() {
     echo "  ╚══════════════════════════════════════════════════════╝"
     echo ""
     if _hermes_mlx_activo; then
-        echo "  🟢 LOCAL   Qwen3-4B   → hermes-ask rapido"
-        echo "  🟢 LOCAL   Qwen3-8B   → hermes-ask codigo"
+        echo "  🟢 LOCAL   Qwen3.5-4B-OptiQ-4bit   → hermes-ask rapido"
+        echo "  🟢 LOCAL   Qwen3.5-4B-OptiQ-4bit   → hermes-ask codigo"
     else
         echo "  🔴 LOCAL   MLX inactivo → mlx-on para activar"
     fi

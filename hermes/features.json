@@ -28,8 +28,8 @@
   },
 
   "aliases_modelo": {
-    "local_fast": "mlx-community/Qwen3-4B-4bit",
-    "local_deep": "mlx-community/Qwen3-8B-4bit",
+    "local_fast": "mlx-community/Qwen3.5-4B-OptiQ-4bit",
+    "local_deep": "mlx-community/Qwen3.5-4B-OptiQ-4bit",
     "remoto_razonamiento": "openrouter/nvidia/llama-3.1-nemotron-ultra-253b-v1:free"
   },
 

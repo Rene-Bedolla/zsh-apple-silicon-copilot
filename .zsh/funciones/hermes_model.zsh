@@ -2,12 +2,12 @@
 # ==============================================================================
 # ARCHIVO: hermes_model.zsh
 # PROPÓSITO: Switch zero-fricción entre modelo local MLX y nube (OpenRouter)
-# PERFIL LOCAL POR DEFECTO: Qwen3-4B-4bit (rápido, menos RAM)
+# PERFIL LOCAL POR DEFECTO: Qwen3.5-4B-OptiQ-4bit 
 # ==============================================================================
 
 _HERMES_CONFIG="$HOME/.hermes/config.yaml"
 _MLX_START="$HOME/Documents/dotfiles/hermes/scripts/mlx-server-start.sh"
-_HERMES_LOCAL_MODEL="mlx-community/Qwen3-4B-4bit"
+_HERMES_LOCAL_MODEL="mlx-community/Qwen3.5-4B-OptiQ-4bit"
 
 function hermes-local() {
     echo "⚙  Configurando HERMES → LOCAL (${_HERMES_LOCAL_MODEL})"

@@ -31,23 +31,23 @@ conversar() {
   case $modo in
     1)
       echo "  ⚡ Iniciando modo rápido — Qwen3 4B\n"
-      mlx_lm.chat --model mlx-community/Qwen3-4B-4bit --max-tokens 1000 --temp 0.6 --top-p 0.9
+      mlx_lm.chat --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 1000 --temp 0.6 --top-p 0.9
       ;;
     2)
       echo "  💻 Iniciando modo código — Qwen3 8B (temp 0.4)\n"
-      mlx_lm.chat --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.4 --top-p 0.85
+      mlx_lm.chat --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.4 --top-p 0.85
       ;;
     3)
       echo "  🔍 Iniciando modo max — Qwen3 8B (sin límite de tokens)\n"
-      mlx_lm.chat --model mlx-community/Qwen3-8B-4bit --max-tokens -1 --temp 0.6 --top-p 0.9
+      mlx_lm.chat --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens -1 --temp 0.6 --top-p 0.9
       ;;
     4)
       echo "  ✨ Iniciando modo creativo — Qwen3 8B (temp 0.8)\n"
-      mlx_lm.chat --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.8 --top-p 0.95
+      mlx_lm.chat --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.8 --top-p 0.95
       ;;
     5)
       echo "  🎯 Iniciando modo preciso — Qwen3 8B (temp 0.3)\n"
-      mlx_lm.chat --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.3 --top-p 0.7
+      mlx_lm.chat --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.3 --top-p 0.7
       ;;
     6)
       echo "  🖼️  Iniciando modo visión — Qwen3 VL 4B\n"
@@ -69,6 +69,6 @@ conversar() {
 
 
 # Utilidades no interactivas
-alias conversar-generar='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 3000 --temp 0.6 --top-p 0.9'
-alias conversar-medidor='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.6 --top-p 0.9 --verbose'
+alias conversar-generar='mlx_lm.generate --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 3000 --temp 0.6 --top-p 0.9'
+alias conversar-medidor='mlx_lm.generate --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.6 --top-p 0.9 --verbose'
 

@@ -66,7 +66,7 @@ function mlx-update() {
             done
 
             echo ""
-            echo "  Modelo activo en :8000 → ${MLX_ACTIVE_MODEL:-mlx-community/Qwen3-4B-4bit}"
+            echo "  Modelo activo en :8000 → ${MLX_ACTIVE_MODEL:-mlx-community/Qwen3.5-4B-OptiQ-4bit}"
             echo "  Comandos: mlx-update --agregar <modelo> | --actualizar <modelo> | --eliminar <modelo>"
             echo ""
             ;;
@@ -158,7 +158,7 @@ function mlx-on() {
         return 0
     fi
     launchctl load "$_MLX_PLIST" 2>/dev/null
-    echo "⏳ Iniciando servidor MLX (${MLX_ACTIVE_MODEL:-Qwen3-4B-4bit})..."
+    echo "⏳ Iniciando servidor MLX (${MLX_ACTIVE_MODEL:-Qwen3.5-4B-OptiQ-4bit})..."
     local intentos=0
     until curl -s http://localhost:8000/v1/models &>/dev/null || (( intentos >= 30 )); do
         sleep 1

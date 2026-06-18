@@ -38,7 +38,7 @@ alias pip=/opt/homebrew/opt/python@3.11/libexec/bin/pip3
 alias traducir-srt='python3 ~/Documents/dotfiles/scripts/translate_srt.py'
 alias transcribir-video='extraerSubs'
 alias transcribir-rápido='extraerSubs $1 tiny'
-alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3-8B-4bit --max-tokens 2000 --temp 0.1 --prompt "Actúa como un analista experto. Lee la siguiente transcripción y extrae de forma estructurada: 1) Resumen (3 viñetas), 2) Tareas asignadas, 3) Puntos críticos. Mantén la objetividad estricta sin inventar datos: "'
+alias procesar-minuta='mlx_lm.generate --model mlx-community/Qwen3.5-4B-OptiQ-4bit --max-tokens 2000 --temp 0.1 --prompt "Actúa como un analista experto. Lee la siguiente transcripción y extrae de forma estructurada: 1) Resumen (3 viñetas), 2) Tareas asignadas, 3) Puntos críticos. Mantén la objetividad estricta sin inventar datos: "'
 
 # ─── Calendario (carl) ────────────────────────────────────────────────────────
 alias cal='carl'
@@ -106,7 +106,7 @@ alias hermes-gateway-status='hermes gateway status'
 
 # ── HERMES — Switch de modelo ─────────────────────────────────────────────────
 # Funciones definidas en: ~/.zsh/funciones/hermes_model.zsh
-# hermes-local       → Qwen3-8B-4bit local via MLX
+# hermes-local       → Qwen3.5-4B-OptiQ-4bit local via MLX
 # hermes-cloud       → Nemotron free via OpenRouter
 # hermes-mlx-stop    → apaga el servidor MLX en :8000
 # hermes-model-status→ muestra provider/modelo activo

@@ -38,7 +38,7 @@ check "mlx-vlm instalado"    "python3 -c 'import mlx_vlm'"
 
 # Modelos en caché
 echo "\n  [F1] Modelos en caché (~/.cache/huggingface/hub/)"
-for model in "Qwen3-8B-4bit" "Qwen3-4B-4bit" "Qwen3-VL-4B-Instruct-4bit" "whisper-small-mlx"; do
+for model in "Qwen3.5-4B-OptiQ-4bit" "Qwen3.5-4B-OptiQ-4bit" "Qwen3-VL-4B-Instruct-4bit" "whisper-small-mlx"; do
   dir=$(ls -d ~/.cache/huggingface/hub/models--mlx-community--${model} 2>/dev/null)
   if [[ -n "$dir" ]]; then
     size=$(du -sh "$dir" 2>/dev/null | awk '{print $1}')
