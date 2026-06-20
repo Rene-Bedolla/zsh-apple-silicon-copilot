@@ -39,7 +39,6 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # ── 7. Utilidades Locales ─────────────────────────────────────────────────────
 export PATH="$HOME/.local/bin:$PATH"
-
 # ── 8. SDKMAN (Java/Groovy) ───────────────────────────────────────────────────
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
@@ -49,5 +48,5 @@ typeset -U PATH
 
 # ── 10. HERMES — Modelo MLX activo ────────────────────────────────────────────
 # Consumida por mlx-server-start.sh y hermes_model.zsh
-# Perfil rápido por defecto: Qwen3-4B-4bit
-export MLX_ACTIVE_MODEL="mlx-community/Qwen3-4B-4bit"
+# Perfil rápido por defecto: Qwen3.5-4B-OptiQ-4bit
+export MLX_ACTIVE_MODEL="mlx-community/Qwen3.5-4B-OptiQ-4bit"
